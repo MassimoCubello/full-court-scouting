@@ -4,14 +4,14 @@ ob_start();
 $pageTitle = "Register"; // Set page title for header
 include __DIR__ . "/components/header.php"; // Header and database connection
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get user details from input fields)
 
     $first_name = $_POST['first_name'];
     $last_name  = $_POST['last_name'];
     $email      = $_POST['email'];
     $password   = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)");
+    $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)"); // Prepare SQL statement to insert new user into database
     $stmt->bind_param("ssss", $first_name, $last_name, $email, $password);
 
     if ($stmt->execute()) { // Registration successful message and redirect to login
@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission
 
 <?php if (isset($error)) echo "<p>$error</p>"; ?> <!-- Display error message if registration fails -->
 
-<form method="POST">
+<form method="POST"> <!-- Registration form -->
     <input name="first_name" placeholder="First Name" required><br>
     <input name="last_name" placeholder="Last Name" required><br>
     <input name="email" type="email" placeholder="Email" required><br>
@@ -38,4 +38,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission
 
 <?php include __DIR__ . "/components/footer.php"; ?> <!-- Footer and close database connection -->
 
-<?php ob_end_flush(); ?>
+<?php ob_end_flush(); ?> <!-- Send output to the browser -->

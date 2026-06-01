@@ -34,7 +34,9 @@ $pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if n
 <body>
     <?php if (isset($_SESSION['user_id'])) : ?> <!-- If user is logged in, show navigation menu -->
         <nav class="site-nav" aria-label="Primary">
-            <a href="dashboard.php">Dashboard</a> <!-- Need to create dashboard page -->
+            <a href="dashboard.php">Dashboard</a>
+            <span aria-hidden="true">|</span>
+            <a href="create-player.php">Create Player</a>
             <span aria-hidden="true">|</span>
             <a href="logout.php">Logout</a>
         </nav>

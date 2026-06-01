@@ -1,5 +1,5 @@
 <?php
-ob_start();
+ob_start(); 
 
 $pageTitle = "Login"; // Set page title for header
 include __DIR__ . "/components/header.php"; // Header and database connection
@@ -9,7 +9,7 @@ if (isset($_SESSION['user_id'])) { // If user is already logged in, redirect to 
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get email and password from input fields)
 
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission
 
 <?php if (isset($error)) echo "<p>$error</p>"; ?> <!-- Display error message if login fails -->
 
-<form method="POST">
+<form method="POST"> <!-- Login form -->
     <input name="email" type="email" placeholder="Email" required><br> 
     <input name="password" type="password" placeholder="Password" required><br>
     <button type="submit">Login</button>
@@ -54,5 +54,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission
 
 <?php include __DIR__ . "/components/footer.php"; ?> <!-- Footer and close database connection -->
 
-<?php ob_end_flush(); ?>
+<?php ob_end_flush(); ?> <!-- Send output to the browser -->
 
