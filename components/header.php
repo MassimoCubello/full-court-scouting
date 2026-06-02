@@ -68,7 +68,9 @@ $pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if n
         <nav class="site-nav" aria-label="Primary">
             <a href="dashboard.php">Dashboard</a>
             <span aria-hidden="true">|</span>
-            <a href="create-player.php">Create Player</a>
+            <a href="create-player.php">Add Player</a>
+            <span aria-hidden="true">|</span>
+            <a href="create-report.php">Create Report</a>
             <?php if (current_user_is_manager()) : ?> 
                 <span aria-hidden="true">|</span>
                 <a href="manage-users.php">Manage Users</a>
