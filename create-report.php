@@ -9,28 +9,51 @@ if (!isset($_SESSION['user_id'])) {
 
 
 
-// GET PLAYER ID (from dashboard link)
+// PLAYER OPTIONS FOR DROPDOWN
 
 
-$player_id = $_GET['player_id'] ?? null;
+$player_options_result = $db->query("\n    SELECT id, first_name, last_name, school\n    FROM players\n    ORDER BY first_name ASC, last_name ASC\n"); // Dropdown menu
 
-if (!$player_id) {
-    die("Player not selected.");
+$player_options = []; // Array to hold player options for the dropdown menu
+
+while ($row = $player_options_result->fetch_assoc()) { // Loop through each player and format their name and school for the dropdown options
+    $label = $row['first_name'] . ' ' . $row['last_name'];
+
+    if (!empty($row['school'])) {
+        $label .= ' (' . $row['school'] . ')';
+    }
+
+    $player_options[] = [
+        'id' => (int) $row['id'],
+        'label' => $label
+    ];
 }
 
 
 
-// GET PLAYER INFO
+// GET PLAYER ID (from dashboard link)
 
 
-$stmt = $db->prepare("SELECT * FROM players WHERE id = ?");
-$stmt->bind_param("i", $player_id);
-$stmt->execute();
+$player_id = null;
 
-$player = $stmt->get_result()->fetch_assoc();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $player_id = isset($_POST['player_id']) ? (int) $_POST['player_id'] : null;
+} else {
+    $player_id = isset($_GET['player_id']) ? (int) $_GET['player_id'] : null;
+}
 
-if (!$player) {
-    die("Player not found.");
+$player = null;
+
+if ($player_id) {
+    $stmt = $db->prepare("SELECT * FROM players WHERE id = ?");
+    $stmt->bind_param("i", $player_id);
+    $stmt->execute();
+
+    $player = $stmt->get_result()->fetch_assoc();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !$player) {
+    $error = "Please select a valid player before submitting a report.";
 }
 
 
@@ -123,13 +146,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <h1>Create Scouting Report</h1>
 
-<h3>
-    Player: <?= $player['first_name'] . ' ' . $player['last_name']; ?>
-</h3>
-
 <?php if (isset($error)) echo "<p>$error</p>"; ?>
 
 <form method="POST">
+
+    <h3>Player Selection</h3>
+
+    <label for="player_id">Player</label><br>
+    <select name="player_id" id="player_id" required>
+        <option value="">Select a player</option>
+        <?php foreach ($player_options as $option) : ?>
+            <option value="<?= $option['id']; ?>" <?= ((int) $option['id'] === (int) $player_id) ? 'selected' : ''; ?>>
+                <?= htmlspecialchars($option['label'], ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+
+    <br><br>
 
     <h3>Attribute Ratings (1–100)</h3> <!-- Form fields for each trait rating -->
 

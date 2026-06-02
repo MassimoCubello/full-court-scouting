@@ -16,8 +16,6 @@ $search = $_GET['search'] ?? ''; // Search term for player name
 $position = $_GET['position'] ?? ''; // Position filter value (e.g., PG, SG, SF, PF, C)
 $sort = $_GET['sort'] ?? 'desc'; // Sort order for ratings: 'desc' for highest first, 'asc' for lowest first
 
-$order = ($sort === 'asc') ? 'ASC' : 'DESC'; // Determine the SQL order direction based on the sort value
-
 
 
 // BASE QUERY
@@ -75,7 +73,15 @@ if (!empty($position)) {
 // SORTING
 
 
-$query .= " ORDER BY latest_rating $order";
+if ($sort === 'asc') {
+    $query .= " ORDER BY latest_rating ASC";
+} elseif ($sort === 'name_asc') {
+    $query .= " ORDER BY players.last_name ASC, players.first_name ASC";
+} elseif ($sort === 'name_desc') {
+    $query .= " ORDER BY players.last_name DESC, players.first_name DESC";
+} else {
+    $query .= " ORDER BY latest_rating DESC";
+}
 
 $result = $db->query($query);
 ?>
@@ -91,6 +97,8 @@ $result = $db->query($query);
 <?php endif; ?>
 
 <a href="create-player.php">Add New Player</a>
+|
+<a href="create-report.php">Create Report</a>
 |
 <a href="logout.php">Logout</a>
 
@@ -126,6 +134,12 @@ $result = $db->query($query);
         </option>
         <option value="asc" <?= $sort == 'asc' ? 'selected' : '' ?>>
             Lowest Rating
+        </option>
+        <option value="name_asc" <?= $sort == 'name_asc' ? 'selected' : '' ?>>
+            Name (A-Z)
+        </option>
+        <option value="name_desc" <?= $sort == 'name_desc' ? 'selected' : '' ?>>
+            Name (Z-A)
         </option>
     </select>
 
