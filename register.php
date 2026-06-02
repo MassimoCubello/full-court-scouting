@@ -7,12 +7,14 @@ include __DIR__ . "/components/header.php"; // Header and database connection
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get user details from input fields)
 
     $first_name = $_POST['first_name'];
-    $last_name  = $_POST['last_name'];
-    $email      = $_POST['email'];
-    $password   = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $last_name = $_POST['last_name'];
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)"); // Prepare SQL statement to insert new user into database
-    $stmt->bind_param("ssss", $first_name, $last_name, $email, $password);
+    $role = 'scout'; // Default role for new users
+
+    $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)"); // Prepare SQL statement to insert new user into database
+    $stmt->bind_param("sssss", $first_name, $last_name, $email, $password, $role);
 
     if ($stmt->execute()) { // Registration successful message and redirect to login
         $_SESSION['success'] = "Account created successfully!";

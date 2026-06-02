@@ -38,7 +38,7 @@ if (!$report) {
 // SECURITY CHECK (OWNERSHIP)
 
 
-if ($report['user_id'] != $_SESSION['user_id']) {
+if (!current_user_can_manage_report($report)) {
     die("You are not allowed to delete this report.");
 }
 

@@ -147,7 +147,7 @@ while ($row = $trait_results->fetch_assoc()) { // Loop through the results and a
 
 <!-- PERMISSIONS -->
 
-<?php if ($_SESSION['user_id'] == $report['user_id']) : ?> <!-- Only show edit/delete options if the logged-in user is the owner of the report -->
+<?php if (current_user_can_manage_report($report)) : ?> <!-- If the current user can manage this report, show edit and delete options -->
 
     <a href="edit-report.php?id=<?= $report['id']; ?>">
         Edit Report

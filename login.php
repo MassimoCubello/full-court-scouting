@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get email
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $db->prepare("SELECT id, first_name, last_name, password FROM users WHERE email = ?");
+    $stmt = $db->prepare("SELECT id, first_name, last_name, password, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute(); // Execute query to find user by email
 
@@ -25,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get email
 
         $_SESSION['user_id'] = $user['id']; // Store user ID in session for authentication
         $_SESSION['user_name'] = $user['first_name'] . " " . $user['last_name']; // Store user name in session for display
+        $_SESSION['user_role'] = $user['role']; // Store user role in session
 
         header("Location: dashboard.php"); // Redirect to dashboard after successful login
         exit;

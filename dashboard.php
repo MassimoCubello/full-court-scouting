@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) { // If the user is not logged in, redirect to
 
 
 // FILTER VALUES
-// =========================================
+
 
 $search = $_GET['search'] ?? ''; // Search term for player name
 $position = $_GET['position'] ?? ''; // Position filter value (e.g., PG, SG, SF, PF, C)
@@ -83,6 +83,12 @@ $result = $db->query($query);
 <h1>Full Court Scouting Dashboard</h1>
 
 <p>Welcome, <?= $_SESSION['user_name']; ?></p>
+
+<?php if (current_user_is_manager()) : ?>
+    <p>
+        <a href="manage-users.php">Manage scouts and managers</a>
+    </p>
+<?php endif; ?>
 
 <a href="create-player.php">Add New Player</a>
 |

@@ -22,6 +22,38 @@ if ($db->connect_error) { // Handle database connection error
 
 $db->set_charset('utf8mb4'); // Set character set to UTF-8 for proper encoding
 
+if (isset($_SESSION['user_id'])) { // If user is logged in, fetch their role and store it in the session for access control
+    $stmt = $db->prepare("SELECT role FROM users WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+
+    $user = $stmt->get_result()->fetch_assoc();
+
+    if ($user) { // If user is found, store their role in the session
+        $_SESSION['user_role'] = $user['role'];
+    } else { // If user not found in database, log them out
+        unset($_SESSION['user_id'], $_SESSION['user_name'], $_SESSION['user_role']);
+    }
+}
+
+if (!function_exists('current_user_is_manager')) { // Check if the current user is a manager
+    function current_user_is_manager(): bool
+    {
+        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'manager';
+    }
+}
+
+if (!function_exists('current_user_can_manage_report')) { // Check if the current user can manage a specific report
+    function current_user_can_manage_report(array $report): bool
+    {
+        if (!isset($_SESSION['user_id'])) {
+            return false;
+        }
+
+        return (int) $report['user_id'] === (int) $_SESSION['user_id'] || current_user_is_manager();
+    }
+}
+
 $pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if not already set
 
 ?>
@@ -37,6 +69,10 @@ $pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if n
             <a href="dashboard.php">Dashboard</a>
             <span aria-hidden="true">|</span>
             <a href="create-player.php">Create Player</a>
+            <?php if (current_user_is_manager()) : ?> 
+                <span aria-hidden="true">|</span>
+                <a href="manage-users.php">Manage Users</a>
+            <?php endif; ?>
             <span aria-hidden="true">|</span>
             <a href="logout.php">Logout</a>
         </nav>
