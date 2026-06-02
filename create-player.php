@@ -13,6 +13,7 @@ if (!isset($_SESSION['user_id'])) { // If user is not logged in, redirect to log
 
 // HANDLE FORM SUBMISSION
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted via POST
 
     $first_name = trim($_POST['first_name'] ?? '');
@@ -31,7 +32,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
     $school = trim($_POST['school'] ?? '');
 
     $nationality = trim($_POST['nationality'] ?? '');
+    $hometown = trim($_POST['hometown'] ?? '');
+    $club_team = trim($_POST['club_team'] ?? '');
+    $jersey_number = trim($_POST['jersey_number'] ?? '');
 
+    $photo = null;
+
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE) { // Check if a photo was uploaded
+        if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+            $error = "Photo upload failed.";
+        } else {
+            $imageInfo = getimagesize($_FILES['photo']['tmp_name']);
+
+            if ($imageInfo === false) { // Validate that the uploaded file is an image
+                $error = "Uploaded file must be an image.";
+            } else {
+                $extension = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                if (!in_array($extension, $allowedExtensions, true)) { // Validate allowed image extensions
+                    $error = "Photo must be a JPG, PNG, GIF, or WebP image.";
+                } else {
+                    $photo = 'assets/img/player-' . uniqid('', true) . '.' . $extension;
+
+                    if (!move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/' . $photo)) { // Save the uploaded photo to the server
+                        $error = "Unable to save uploaded photo.";
+                    }
+                }
+            }
+        }
+    }
 
 
     // VALIDATION: match required fields on the form.
@@ -56,9 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
             height,
             weight,
             school,
-            nationality
+            nationality,
+            hometown,
+            club_team,
+            jersey_number,
+            photo
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ";
 
         $stmt = $db->prepare($query); // Prepare the SQL statement
@@ -73,9 +107,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
             $weight = ($weight === '') ? null : (int) $weight;
             $school = ($school === '') ? null : $school;
             $nationality = ($nationality === '') ? null : $nationality;
+            $hometown = ($hometown === '') ? null : $hometown;
+            $club_team = ($club_team === '') ? null : $club_team;
+            $jersey_number = ($jersey_number === '') ? null : (int) $jersey_number;
 
             $stmt->bind_param(
-                "sssssssiss",
+                "sssssssissssis",
                 $first_name,
                 $last_name,
                 $primary_position,
@@ -85,7 +122,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
                 $height,
                 $weight,
                 $school,
-                $nationality
+                $nationality,
+                $hometown,
+                $club_team,
+                $jersey_number,
+                $photo
             );
 
             if ($stmt->execute()) {
@@ -111,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
     <p><?= $error; ?></p>
 <?php endif; ?>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
 
     <label>First Name *</label><br>
     <input type="text" name="first_name" required value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
@@ -174,6 +215,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 
     <label>School</label><br>
     <input type="text" name="school" value="<?= htmlspecialchars($_POST['school'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Hometown</label><br>
+    <input type="text" name="hometown" value="<?= htmlspecialchars($_POST['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Club Team</label><br>
+    <input type="text" name="club_team" value="<?= htmlspecialchars($_POST['club_team'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Jersey Number</label><br>
+    <input type="number" name="jersey_number" value="<?= htmlspecialchars($_POST['jersey_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Photo</label><br>
+    <input type="file" name="photo" accept="image/*"><br><br>
 
 
     <label>Nationality</label><br>

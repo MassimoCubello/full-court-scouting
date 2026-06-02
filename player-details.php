@@ -67,6 +67,12 @@ $reports = $stmt->get_result(); // Get the result of the query, which should con
     <?= $player['first_name'] . ' ' . $player['last_name']; ?>
 </h1>
 
+<?php if (!empty($player['photo'])) : ?>
+    <p>
+        <img src="<?= htmlspecialchars($player['photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($player['first_name'] . ' ' . $player['last_name'], ENT_QUOTES, 'UTF-8'); ?>" style="max-width:220px; height:auto;">
+    </p>
+<?php endif; ?>
+
 <hr>
 
 <h2>Player Information</h2>
@@ -109,7 +115,22 @@ $reports = $stmt->get_result(); // Get the result of the query, which should con
 
 <p>
     <strong>School:</strong>
-    <?= $player['school']; ?>
+    <?= $player['school'] ?: 'N/A'; ?>
+</p>
+
+<p>
+    <strong>Hometown:</strong>
+    <?= $player['hometown'] ?: 'Unknown'; ?>
+</p>
+
+<p>
+    <strong>Club Team:</strong>
+    <?= $player['club_team'] ?: 'N/A'; ?>
+</p>
+
+<p>
+    <strong>Jersey Number:</strong>
+    <?= $player['jersey_number'] !== null ? $player['jersey_number'] : 'N/A'; ?>
 </p>
 
 <p>

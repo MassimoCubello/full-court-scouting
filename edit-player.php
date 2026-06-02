@@ -58,6 +58,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $school = trim($_POST['school'] ?? '');
 
     $nationality = trim($_POST['nationality'] ?? '');
+    $hometown = trim($_POST['hometown'] ?? '');
+    $club_team = trim($_POST['club_team'] ?? '');
+    $jersey_number = trim($_POST['jersey_number'] ?? '');
+
+    $photo = $player['photo'];
+
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE) { // Check if a new photo was uploaded
+        if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+            $error = "Photo upload failed.";
+        } else {
+            $imageInfo = getimagesize($_FILES['photo']['tmp_name']);
+
+            if ($imageInfo === false) { // Validate that the uploaded file is an image
+                $error = "Uploaded file must be an image.";
+            } else {
+                $extension = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                if (!in_array($extension, $allowedExtensions, true)) { // Validate allowed image extensions
+                    $error = "Photo must be a JPG, PNG, GIF, or WebP image.";
+                } else {
+                    $photo = 'assets/img/player-' . uniqid('', true) . '.' . $extension;
+
+                    if (!move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/' . $photo)) { // Save the uploaded photo to the server
+                        $error = "Unable to save uploaded photo.";
+                    }
+                }
+            }
+        }
+    }
 
 
     // VALIDATION: match required fields on the form.
@@ -82,7 +112,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             height = ?,
             weight = ?,
             school = ?,
-            nationality = ?
+            nationality = ?,
+            hometown = ?,
+            club_team = ?,
+            jersey_number = ?,
+            photo = ?
         WHERE id = ?
         ";
 
@@ -98,9 +132,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $weight = ($weight === '') ? null : (int) $weight;
             $school = ($school === '') ? null : $school;
             $nationality = ($nationality === '') ? null : $nationality;
+            $hometown = ($hometown === '') ? null : $hometown;
+            $club_team = ($club_team === '') ? null : $club_team;
+            $jersey_number = ($jersey_number === '') ? null : (int) $jersey_number;
 
             $stmt->bind_param(
-                "sssssssissi",
+                "sssssssissssisi",
                 $first_name,
                 $last_name,
                 $primary_position,
@@ -111,6 +148,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $weight,
                 $school,
                 $nationality,
+                $hometown,
+                $club_team,
+                $jersey_number,
+                $photo,
                 $player_id
             );
 
@@ -140,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <p><?= $error; ?></p>
 <?php endif; ?>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
 
     <label>First Name *</label><br>
     <input type="text" name="first_name" required value="<?= htmlspecialchars($player['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
@@ -203,6 +244,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <label>School</label><br>
     <input type="text" name="school" value="<?= htmlspecialchars($player['school'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Hometown</label><br>
+    <input type="text" name="hometown" value="<?= htmlspecialchars($player['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Club Team</label><br>
+    <input type="text" name="club_team" value="<?= htmlspecialchars($player['club_team'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Jersey Number</label><br>
+    <input type="number" name="jersey_number" min="0" value="<?= htmlspecialchars($player['jersey_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Photo</label><br>
+    <?php if (!empty($player['photo'])) : ?>
+        <img src="<?= htmlspecialchars($player['photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" style="max-width:160px; display:block; margin-bottom:10px;">
+    <?php endif; ?>
+    <input type="file" name="photo" accept="image/*"><br><br>
 
 
     <label>Nationality</label><br>
