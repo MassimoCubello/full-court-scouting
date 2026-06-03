@@ -162,6 +162,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endforeach; ?>
     </select>
 
+    <a href="create-player.php" style="margin-left:10px;">
+        Add New Player
+    </a>
+
     <br><br>
 
     <h3>Attribute Ratings (1–100)</h3> <!-- Form fields for each trait rating -->

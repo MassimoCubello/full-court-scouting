@@ -81,6 +81,14 @@ $reports = $stmt->get_result(); // Get the result of the query, which should con
     Edit Player
 </a>
 
+<?php if (current_user_is_manager()) : ?> <!-- Only show delete option to managers, and prevent deleting if it's the last manager account in the system (handled in delete-player.php) -->
+    |
+
+    <a href="delete-player.php?id=<?= $player['id']; ?>" style="color:red;">
+        Delete Player
+    </a>
+<?php endif; ?>
+
 <br><br>
 
 <p>
