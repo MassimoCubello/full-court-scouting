@@ -55,27 +55,34 @@ if (!function_exists('current_user_can_manage_report')) { // Check if the curren
 }
 
 $pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if not already set
+$basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/'); // Calculate base path for stylesheet link
+$stylesheetHref = ($basePath === '' ? '' : $basePath) . '/assets/css/style.css?v=20260527'; // Append version query parameter to force stylesheet refresh
 
 ?>
 <!DOCTYPE html>
     <html>
         <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             <title><?= $pageTitle ?></title>
-            <link rel="stylesheet" href="assets/css/style.css">
+            <link rel="stylesheet" href="<?= htmlspecialchars($stylesheetHref, ENT_QUOTES, 'UTF-8'); ?>">
         </head>
 <body>
     <?php if (isset($_SESSION['user_id'])) : ?> <!-- If user is logged in, show navigation menu -->
         <nav class="site-nav" aria-label="Primary">
-            <a href="dashboard.php">Dashboard</a>
-            <span aria-hidden="true">|</span>
-            <a href="create-player.php">Add Player</a>
-            <span aria-hidden="true">|</span>
-            <a href="create-report.php">Create Report</a>
-            <?php if (current_user_is_manager()) : ?> 
+            <span class="site-brand">Full Court Scouting</span>
+            <div class="site-nav-links">
+                <a href="dashboard.php">Dashboard</a>
                 <span aria-hidden="true">|</span>
-                <a href="manage-users.php">Manage Users</a>
-            <?php endif; ?>
-            <span aria-hidden="true">|</span>
-            <a href="logout.php">Logout</a>
+                <a href="create-player.php">Add Player</a>
+                <span aria-hidden="true">|</span>
+                <a href="create-report.php">Create Scouting Report</a>
+                <?php if (current_user_is_manager()) : ?> 
+                    <span aria-hidden="true">|</span>
+                    <a href="manage-users.php">Manage Users</a>
+                <?php endif; ?>
+                <span aria-hidden="true">|</span>
+                <a href="logout.php">Logout</a>
+            </div>    
         </nav>
     <?php endif; ?>
+    <main class="page-shell"> <!-- Main content area where page-specific content will be displayed -->
