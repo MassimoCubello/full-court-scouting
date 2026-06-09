@@ -60,135 +60,128 @@ $stmt = $db->prepare($reportQuery);
 $stmt->bind_param("i", $player_id);
 $stmt->execute();
 
-$reports = $stmt->get_result(); // Get the result of the query, which should contain all scouting reports for the player, along with the scout's name
+$reportsResult = $stmt->get_result(); // Get the result of the query, which should contain all scouting reports for the player, along with the scout's name
+$reports = []; // Initialize an empty array to store the reports
+
+while ($row = $reportsResult->fetch_assoc()) { // Loop through the result and add each report to the $reports array
+    $reports[] = $row;
+}
+
+$playerFullName = trim(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? '')); // Combine first and last name
+$latestOverallRating = !empty($reports) ? $reports[0]['overall_rating'] : null; // Get the overall rating from the most recent report, or set to null if there are no reports
 ?>
 
-<h1>
-    <?= $player['first_name'] . ' ' . $player['last_name']; ?>
-</h1>
+<section class="player-profile">
+    <div class="player-hero">
+        <div class="player-hero-main">
+            <h1><?= htmlspecialchars($playerFullName, ENT_QUOTES, 'UTF-8'); ?></h1>
+            <p class="player-subtitle">Scouting Profile</p>
 
-<?php if (!empty($player['photo'])) : ?>
-    <p>
-        <img src="<?= htmlspecialchars($player['photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($player['first_name'] . ' ' . $player['last_name'], ENT_QUOTES, 'UTF-8'); ?>" style="max-width:220px; height:auto;">
-    </p>
-<?php endif; ?>
-
-<hr>
-
-<h2>Player Information</h2>
-
-<a href="edit-player.php?id=<?= $player['id']; ?>">
-    Edit Player
-</a>
-
-<?php if (current_user_is_manager()) : ?> <!-- Only show delete option to managers, and prevent deleting if it's the last manager account in the system (handled in delete-player.php) -->
-    |
-
-    <a href="delete-player.php?id=<?= $player['id']; ?>" style="color:red;">
-        Delete Player
-    </a>
-<?php endif; ?>
-
-<br><br>
-
-<p>
-    <strong>Primary Position:</strong>
-    <?= $player['primary_position']; ?>
-</p>
-
-<p>
-    <strong>Secondary Position:</strong>
-    <?= $player['secondary_position'] ?: 'N/A'; ?>
-</p>
-
-<p>
-    <strong>Shooting Hand:</strong>
-    <?= $player['shooting_hand'] ?: 'N/A'; ?>
-</p>
-
-<p>
-    <strong>Date of Birth:</strong>
-    <?= $player['date_of_birth']; ?>
-</p>
-
-<p>
-    <strong>Height:</strong>
-    <?= $player['height']; ?>
-</p>
-
-<p>
-    <strong>Weight:</strong>
-    <?= $player['weight']; ?> lbs
-</p>
-
-<p>
-    <strong>School:</strong>
-    <?= $player['school'] ?: 'N/A'; ?>
-</p>
-
-<p>
-    <strong>Hometown:</strong>
-    <?= $player['hometown'] ?: 'Unknown'; ?>
-</p>
-
-<p>
-    <strong>Club Team:</strong>
-    <?= $player['club_team'] ?: 'N/A'; ?>
-</p>
-
-<p>
-    <strong>Jersey Number:</strong>
-    <?= $player['jersey_number'] !== null ? $player['jersey_number'] : 'N/A'; ?>
-</p>
-
-<p>
-    <strong>Nationality:</strong>
-    <?= $player['nationality'] ?: 'Unknown'; ?>
-</p>
-
-<hr>
-
-<h2>Scouting Reports</h2>
-
-<a href="create-report.php?player_id=<?= $player['id']; ?>">
-    Create New Report
-</a>
-
-<br><br>
-
-<?php if ($reports->num_rows > 0) : ?> <!-- If there are reports for this player, display them in a list -->
-
-    <?php while($report = $reports->fetch_assoc()) : ?> 
-
-        <div style="border:1px solid black; padding:15px; margin-bottom:20px;">
-
-            <p>
-                <strong>Date:</strong>
-                <?= $report['created_at']; ?>
-            </p>
-
-            <p>
-                <strong>Scout:</strong>
-                <?= $report['first_name'] . ' ' . $report['last_name']; ?>
-            </p>
-
-            <p>
-                <strong>Overall Rating:</strong>
-                <?= $report['overall_rating']; ?>
-            </p>
-
-            <a href="report-details.php?id=<?= $report['id']; ?>"> 
-                View Full Report
-            </a>
-
+            <div class="player-quick-stats">
+                <span class="stat-pill accent-pill">
+                    LATEST RATING: <?= htmlspecialchars($latestOverallRating !== null ? (string) $latestOverallRating : 'N/A', ENT_QUOTES, 'UTF-8'); ?>
+                </span>
+            </div>
         </div>
 
-    <?php endwhile; ?>
+        <div class="player-photo-wrap">
+            <?php if (!empty($player['photo'])) : ?>
+                <img src="<?= htmlspecialchars($player['photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($playerFullName, ENT_QUOTES, 'UTF-8'); ?>">
+            <?php else : ?>
+                <div class="player-photo-placeholder">No Photo</div>
+            <?php endif; ?>
+        </div>
+    </div>
 
-<?php else : ?>
+    <div class="player-actions">
+        <a href="edit-player.php?id=<?= $player['id']; ?>">Edit Player</a>
 
-    <p>No reports available for this player.</p>
+        <?php if (current_user_is_manager()) : ?>
+            <span aria-hidden="true">|</span>
+            <a class="danger-link" href="delete-player.php?id=<?= $player['id']; ?>">Delete Player</a>
+        <?php endif; ?>
+    </div>
 
-<?php endif; ?>
+    <div class="player-info-grid">
+        <div class="info-item">
+            <span class="info-label">Primary Position</span>
+            <span class="info-value"><?= htmlspecialchars($player['primary_position'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Secondary Position</span>
+            <span class="info-value"><?= htmlspecialchars($player['secondary_position'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Shooting Hand</span>
+            <span class="info-value"><?= htmlspecialchars($player['shooting_hand'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Date of Birth</span>
+            <span class="info-value"><?= htmlspecialchars($player['date_of_birth'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Height</span>
+            <span class="info-value"><?= htmlspecialchars($player['height'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Weight</span>
+            <span class="info-value"><?= htmlspecialchars($player['weight'] ? $player['weight'] . ' lbs' : 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">School</span>
+            <span class="info-value"><?= htmlspecialchars($player['school'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Hometown</span>
+            <span class="info-value"><?= htmlspecialchars($player['hometown'] ?: 'Unknown', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Club Team</span>
+            <span class="info-value"><?= htmlspecialchars($player['club_team'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Jersey Number</span>
+            <span class="info-value"><?= htmlspecialchars($player['jersey_number'] !== null ? (string) $player['jersey_number'] : 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Nationality</span>
+            <span class="info-value"><?= htmlspecialchars($player['nationality'] ?: 'Unknown', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+    </div>
+</section>
+
+<section class="reports-section">
+    <div class="reports-header-row">
+        <h2>Scouting Reports</h2>
+        <a class="reports-cta" href="create-report.php?player_id=<?= $player['id']; ?>">Create New Report</a>
+    </div>
+
+    <?php if (!empty($reports)) : ?>
+        <div class="report-grid">
+            <?php foreach ($reports as $report) : ?>
+                <article class="report-card">
+                    <p class="report-line">
+                        <span class="report-label">Date</span>
+                        <span class="report-value"><?= htmlspecialchars($report['created_at'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    </p>
+
+                    <p class="report-line">
+                        <span class="report-label">Scout</span>
+                        <span class="report-value"><?= htmlspecialchars($report['first_name'] . ' ' . $report['last_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    </p>
+
+                    <p class="report-line">
+                        <span class="report-label">Overall Rating</span>
+                        <span class="rating-badge"><?= htmlspecialchars((string) $report['overall_rating'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    </p>
+
+                    <a href="report-details.php?id=<?= $report['id']; ?>">View Full Report</a>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php else : ?>
+        <p class="empty-state">No reports available for this player.</p>
+    <?php endif; ?>
+</section>
 
 <?php include __DIR__ . "/components/footer.php"; ?> <!-- Include footer and close database connection -->

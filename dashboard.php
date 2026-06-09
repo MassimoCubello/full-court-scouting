@@ -14,7 +14,6 @@ if (!isset($_SESSION['user_id'])) { // If the user is not logged in, redirect to
 
 $search = $_GET['search'] ?? ''; // Search term for player name
 $position = $_GET['position'] ?? ''; // Position filter value (e.g., PG, SG, SF, PF, C)
-$sort = $_GET['sort'] ?? 'desc'; // Sort order for ratings: 'desc' for highest first, 'asc' for lowest first
 
 
 
@@ -69,19 +68,7 @@ if (!empty($position)) {
 }
 
 
-
-// SORTING
-
-
-if ($sort === 'asc') {
-    $query .= " ORDER BY latest_rating ASC";
-} elseif ($sort === 'name_asc') {
-    $query .= " ORDER BY players.last_name ASC, players.first_name ASC";
-} elseif ($sort === 'name_desc') {
-    $query .= " ORDER BY players.last_name DESC, players.first_name DESC";
-} else {
-    $query .= " ORDER BY latest_rating DESC";
-}
+$query .= " ORDER BY (latest_rating IS NULL) ASC, latest_rating DESC LIMIT 10";
 
 $result = $db->query($query);
 ?>
@@ -96,6 +83,8 @@ $result = $db->query($query);
     </p>
 <?php endif; ?>
 
+<a href="view-players.php">View All Players</a>
+|
 <a href="create-player.php">Add New Player</a>
 |
 <a href="create-report.php">Create Report</a>
@@ -104,7 +93,7 @@ $result = $db->query($query);
 
 <hr>
 
-<h2>Players</h2>
+<h2>Top Rated Players</h2>
 
 
 <!-- FILTER FORM -->
@@ -128,22 +117,7 @@ $result = $db->query($query);
         <option value="C"  <?= $position == 'C'  ? 'selected' : '' ?>>C</option>
     </select>
 
-    <select name="sort">
-        <option value="desc" <?= $sort == 'desc' ? 'selected' : '' ?>>
-            Highest Rating
-        </option>
-        <option value="asc" <?= $sort == 'asc' ? 'selected' : '' ?>>
-            Lowest Rating
-        </option>
-        <option value="name_asc" <?= $sort == 'name_asc' ? 'selected' : '' ?>>
-            Name (A-Z)
-        </option>
-        <option value="name_desc" <?= $sort == 'name_desc' ? 'selected' : '' ?>>
-            Name (Z-A)
-        </option>
-    </select>
-
-    <button type="submit">Apply</button>
+        <button type="submit">Apply</button>
 
 </form>
 
@@ -164,7 +138,7 @@ $result = $db->query($query);
         <tr>
 
             <td>
-                <?= $player['first_name'] . ' ' . $player['last_name']; ?>
+                <?= $player['last_name'] . ', ' . $player['first_name']; ?>
             </td>
 
             <td>
