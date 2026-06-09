@@ -55,8 +55,17 @@ if (!function_exists('current_user_can_manage_report')) { // Check if the curren
 }
 
 $pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if not already set
-$basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/'); // Calculate base path for stylesheet link
-$stylesheetHref = ($basePath === '' ? '' : $basePath) . '/assets/css/style.css?v=20260527'; // Append version query parameter to force stylesheet refresh
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? ''); // Get the current script name
+$basePath = rtrim(dirname($scriptName), '/'); // Calculate base path for stylesheet link
+
+if ($basePath === '/' || $basePath === '.') { // If base path is root, set it to empty string for correct stylesheet path
+    $basePath = '';
+}
+
+$cssFilePath = __DIR__ . '/../assets/css/style.css'; // Path to the CSS file for versioning
+$cssVersion = is_file($cssFilePath) ? (string) filemtime($cssFilePath) : '1'; // Use file modification time as version for cache busting, or '1' if file doesn't exist
+$stylesheetHref = ($basePath === '' ? '' : $basePath) . '/assets/css/style.css?v=' . $cssVersion; // Construct the stylesheet href with version query parameter for cache busting
+$currentPage = basename($_SERVER['PHP_SELF'] ?? ''); // Get current page filename for active link highlighting
 
 ?>
 <!DOCTYPE html>
@@ -83,6 +92,15 @@ $stylesheetHref = ($basePath === '' ? '' : $basePath) . '/assets/css/style.css?v
                 <span aria-hidden="true">|</span>
                 <a href="logout.php">Logout</a>
             </div>    
+        </nav>
+    <?php else : ?> <!-- If user is not logged in, show login/register links -->
+        <nav class="site-nav guest-nav" aria-label="Primary">
+            <a class="site-brand" href="login.php">Full Court Scouting</a>
+            <div class="site-nav-links">
+                <a class="<?= $currentPage === 'login.php' ? 'is-active' : ''; ?>" href="login.php">Login</a>
+                <span aria-hidden="true">|</span>
+                <a class="<?= $currentPage === 'register.php' ? 'is-active' : ''; ?>" href="register.php">Register</a>
+            </div>
         </nav>
     <?php endif; ?>
     <main class="page-shell"> <!-- Main content area where page-specific content will be displayed -->

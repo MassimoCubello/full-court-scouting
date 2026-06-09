@@ -40,9 +40,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get email
 
 <?php if (isset($error)) echo "<p>$error</p>"; ?> <!-- Display error message if login fails -->
 
+<p class="required-note">* = required field</p>
+
 <form method="POST"> <!-- Login form -->
-    <input name="email" type="email" placeholder="Email" required><br> 
-    <input name="password" type="password" placeholder="Password" required><br>
+    <label for="login-email">Email *</label><br>
+    <input id="login-email" name="email" type="email" placeholder="Email" required><br>
+
+    <label for="login-password">Password *</label><br>
+    <input id="login-password" name="password" type="password" placeholder="Password" required><br>
+    
     <button type="submit">Login</button>
 </form>
 

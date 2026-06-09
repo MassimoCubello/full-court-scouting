@@ -34,7 +34,7 @@ body { /* Basic styles for the body of the page */
     line-height: 1.55;
 }
 
-a {
+a { /* Styles for links */
     color: var(--color-secondary);
     font-weight: 600;
     text-decoration-thickness: 2px;
@@ -48,7 +48,7 @@ a:hover {
 
 h1,
 h2,
-h3 {
+h3 { /* Styles for headings */
     margin: 0 0 0.6rem;
     font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
     color: var(--color-primary);
@@ -69,11 +69,17 @@ h3 {
     color: var(--color-secondary);
 }
 
-p {
+p { /* Styles for paragraphs */
     margin: 0.2rem 0 1rem;
 }
 
-hr {
+.required-note { /* Styles for the note about required fields in forms */
+    margin: 0.2rem 0 0.8rem;
+    font-size: 0.92rem;
+    color: var(--color-muted);
+}
+
+hr { /* Styles for horizontal rules */
     border: 0;
     height: 1px;
     margin: 1.6rem 0;
@@ -95,7 +101,7 @@ hr {
     box-shadow: var(--shadow-md);
 }
 
-.site-brand {
+.site-brand { /* Styles for the site branding/logo area */
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -106,9 +112,11 @@ hr {
     letter-spacing: 0.4px;
     color: #F8FAFC;
     text-transform: uppercase;
+    text-decoration: none;
+    padding: 0;
 }
 
-.site-nav-links {
+.site-nav-links { /* Styles for the container of navigation links */
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -126,11 +134,22 @@ hr {
     color: #FFFFFF;
 }
 
-.site-nav span[aria-hidden='true'] {
+.site-nav a.is-active { /* Styles for the active navigation link */
+    color: #FFFFFF;
+    background: rgba(248, 250, 252, 0.18);
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+}
+
+.site-nav span[aria-hidden='true'] { /* Styles for the separator between navigation links */
     color: rgba(226, 232, 240, 0.5);
 }
 
-.page-shell {
+.guest-nav { /* Styles for the navigation menu when the user is not logged in */
+    margin-top: 1.4rem;
+}
+
+.page-shell { /* Styles for the main content area of the page */
     width: min(1120px, calc(100% - 2rem));
     margin: 0 auto 2.6rem;
     padding: clamp(1rem, 2.8vw, 1.8rem);
@@ -152,11 +171,11 @@ hr {
     font-size: 0.95rem;
 }
 
-form {
+form { 
     margin-top: 1rem;
 }
 
-label {
+label { /* Styles for form labels */
     display: inline-block;
     margin-bottom: 0.25rem;
     font-weight: 700;
@@ -166,18 +185,19 @@ label {
 input,
 select,
 textarea,
-button {
+button { /* Reset styles for form elements */
     font: inherit;
 }
 
 input[type='text'],
+input:not([type]),
 input[type='email'],
 input[type='password'],
 input[type='number'],
 input[type='date'],
 input[type='file'],
 select,
-textarea {
+textarea { /* Styles for text inputs, selects, and textareas */
     width: min(640px, 100%);
     padding: 0.62rem 0.72rem;
     border: 1px solid var(--color-border);
@@ -201,7 +221,7 @@ textarea:focus {
 }
 
 button,
-input[type='submit'] {
+input[type='submit'] { /* Styles for buttons and submit inputs */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -217,23 +237,23 @@ input[type='submit'] {
 }
 
 button:hover,
-input[type='submit']:hover {
+input[type='submit']:hover { /* Hover effect for buttons */
     filter: brightness(1.03);
     box-shadow: 0 10px 22px rgba(234, 88, 12, 0.28);
     transform: translateY(-1px);
 }
 
 button:active,
-input[type='submit']:active {
+input[type='submit']:active { /* Active state for buttons */
     transform: translateY(0);
 }
 
 button[style*='color:red'],
-a[style*='color:red'] {
+a[style*='color:red'] { /* Styles for elements with inline style containing 'color:red' */
     color: #FECACA !important;
 }
 
-table {
+table { /* Styles for tables */
     width: 100%;
     border-collapse: collapse;
     margin-top: 0.8rem;
@@ -244,14 +264,14 @@ table {
 }
 
 th,
-td {
+td { /* Styles for table header and data cells */
     padding: 0.74rem;
     text-align: left;
     border-bottom: 1px solid #E2E8F0;
     vertical-align: top;
 }
 
-th {
+th { /* Styles for table header cells */
     font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
     letter-spacing: 0.25px;
     font-size: 1.03rem;
@@ -259,22 +279,22 @@ th {
     background: linear-gradient(120deg, var(--color-primary) 0%, var(--color-secondary) 100%);
 }
 
-tr:nth-child(even) td {
+tr:nth-child(even) td { /* Styles for even table rows */
     background: #F8FAFC;
 }
 
-td form {
+td form { /* Styles for forms inside table cells */
     margin: 0;
 }
 
-img {
+img { /* Styles for images */
     max-width: 100%;
     border-radius: var(--radius-sm);
     border: 1px solid #E2E8F0;
     box-shadow: var(--shadow-sm);
 }
 
-div[style*='border:1px solid black'] {
+div[style*='border:1px solid black'] { /* Styles for divs with inline style containing 'border:1px solid black' */
     border: 1px solid #CBD5E1 !important;
     border-left: 5px solid var(--color-accent) !important;
     border-radius: var(--radius-sm);
@@ -283,7 +303,7 @@ div[style*='border:1px solid black'] {
     box-shadow: var(--shadow-sm);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* Responsive styles for screens smaller than 768px */
     .site-nav {
         gap: 0.65rem;
         padding: 0.8rem 0.95rem;
@@ -297,7 +317,7 @@ div[style*='border:1px solid black'] {
         padding: 0.95rem;
     }
 
-    table {
+    table { /* Responsive styles for tables */
         font-size: 0.95rem;
     }
 }

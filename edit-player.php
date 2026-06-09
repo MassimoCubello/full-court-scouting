@@ -63,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $jersey_number = trim($_POST['jersey_number'] ?? '');
 
     $photo = $player['photo'];
+    $uploadError = false;
 
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE) { // Check if a new photo was uploaded
         if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
@@ -79,10 +80,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (!in_array($extension, $allowedExtensions, true)) { // Validate allowed image extensions
                     $error = "Photo must be a JPG, PNG, GIF, or WebP image.";
                 } else {
-                    $photo = 'assets/img/player-' . uniqid('', true) . '.' . $extension;
+                    $generatedPhotoPath = 'assets/img/player-' . uniqid('', true) . '.' . $extension;
+                    $photoDirectory = __DIR__ . '/assets/img';
 
-                    if (!move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/' . $photo)) { // Save the uploaded photo to the server
+                    if (!is_dir($photoDirectory) && !mkdir($photoDirectory, 0775, true)) { // Ensure the upload directory exists and is writable
+                        $error = "Unable to create image upload directory.";
+                        $uploadError = true;
+                    } elseif (!move_uploaded_file($_FILES['photo']['tmp_name'], __DIR__ . '/' . $generatedPhotoPath)) { // Save the uploaded photo to the server
                         $error = "Unable to save uploaded photo.";
+                        $uploadError = true;
+                    } else {
+                        $photo = $generatedPhotoPath;
                     }
                 }
             }
@@ -91,13 +99,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     // VALIDATION: match required fields on the form.
-    if (
-        empty($first_name) ||
-        empty($last_name) ||
-        empty($primary_position)
-    ) {
+    if (isset($error) || $uploadError || empty($first_name) || empty($last_name) || empty($primary_position)) {
 
-        $error = "Please complete all required fields.";
+        if (!isset($error)) {
+            $error = "Please complete all required fields.";
+        }
 
     } else {
 

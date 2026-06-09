@@ -30,13 +30,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get user 
 
 <?php if (isset($error)) echo "<p>$error</p>"; ?> <!-- Display error message if registration fails -->
 
+<p class="required-note">* = required field</p>
+
 <form method="POST"> <!-- Registration form -->
-    <input name="first_name" placeholder="First Name" required><br>
-    <input name="last_name" placeholder="Last Name" required><br>
-    <input name="email" type="email" placeholder="Email" required><br>
-    <input name="password" type="password" placeholder="Password" required><br>
+    <label for="register-first-name">First Name *</label><br>
+    <input id="register-first-name" name="first_name" type="text" placeholder="First Name" required><br>
+
+    <label for="register-last-name">Last Name *</label><br>
+    <input id="register-last-name" name="last_name" type="text" placeholder="Last Name" required><br>
+
+    <label for="register-email">Email *</label><br>
+    <input id="register-email" name="email" type="email" placeholder="Email" required><br>
+
+    <label for="register-password">Password *</label><br>
+    <input id="register-password" name="password" type="password" placeholder="Password" required><br>
+
     <button type="submit">Register</button>
 </form>
+
+<p>
+    Already have an account?
+    <a href="login.php">Go to Login</a>
+</p>
 
 <?php include __DIR__ . "/components/footer.php"; ?> <!-- Footer and close database connection -->
 
