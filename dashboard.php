@@ -83,11 +83,11 @@ $result = $db->query($query);
     </p>
 <?php endif; ?>
 
-<a href="view-players.php">View All Players</a>
-|
 <a href="create-player.php">Add New Player</a>
 |
-<a href="create-report.php">Create Report</a>
+<a href="create-report.php">Create Scouting Report</a>
+|
+<a href="view-players.php">View All Players</a>
 |
 <a href="logout.php">Logout</a>
 

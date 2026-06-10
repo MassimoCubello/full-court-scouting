@@ -33,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 
     $nationality = trim($_POST['nationality'] ?? '');
     $hometown = trim($_POST['hometown'] ?? '');
+    $province_state = trim($_POST['province_state'] ?? '');
     $club_team = trim($_POST['club_team'] ?? '');
     $jersey_number = trim($_POST['jersey_number'] ?? '');
 
@@ -94,11 +95,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
             school,
             nationality,
             hometown,
+            province_state,
             club_team,
             jersey_number,
             photo
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ";
 
         $stmt = $db->prepare($query); // Prepare the SQL statement
@@ -114,11 +116,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
             $school = ($school === '') ? null : $school;
             $nationality = ($nationality === '') ? null : $nationality;
             $hometown = ($hometown === '') ? null : $hometown;
+            $province_state = ($province_state === '') ? null : $province_state;
             $club_team = ($club_team === '') ? null : $club_team;
             $jersey_number = ($jersey_number === '') ? null : (int) $jersey_number;
 
             $stmt->bind_param(
-                "sssssssissssis",
+                "sssssssisssssis",
                 $first_name,
                 $last_name,
                 $primary_position,
@@ -130,6 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
                 $school,
                 $nationality,
                 $hometown,
+                $province_state,
                 $club_team,
                 $jersey_number,
                 $photo
@@ -152,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 }
 ?>
 
-<h1>Create Player</h1>
+<h1>Add New Player</h1>
 
 <?php if (isset($error)) : ?> 
     <p><?= $error; ?></p>
@@ -225,6 +229,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 
     <label>Hometown</label><br>
     <input type="text" name="hometown" value="<?= htmlspecialchars($_POST['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Province/State</label><br>
+    <input type="text" name="province_state" value="<?= htmlspecialchars($_POST['province_state'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Club Team</label><br>

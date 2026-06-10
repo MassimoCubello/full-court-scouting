@@ -59,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $nationality = trim($_POST['nationality'] ?? '');
     $hometown = trim($_POST['hometown'] ?? '');
+    $province_state = trim($_POST['province_state'] ?? '');
     $club_team = trim($_POST['club_team'] ?? '');
     $jersey_number = trim($_POST['jersey_number'] ?? '');
 
@@ -120,6 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             school = ?,
             nationality = ?,
             hometown = ?,
+            province_state = ?,
             club_team = ?,
             jersey_number = ?,
             photo = ?
@@ -139,11 +141,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $school = ($school === '') ? null : $school;
             $nationality = ($nationality === '') ? null : $nationality;
             $hometown = ($hometown === '') ? null : $hometown;
+            $province_state = ($province_state === '') ? null : $province_state;
             $club_team = ($club_team === '') ? null : $club_team;
             $jersey_number = ($jersey_number === '') ? null : (int) $jersey_number;
 
             $stmt->bind_param(
-                "sssssssissssisi",
+                "sssssssisssssisi",
                 $first_name,
                 $last_name,
                 $primary_position,
@@ -155,6 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $school,
                 $nationality,
                 $hometown,
+                $province_state,
                 $club_team,
                 $jersey_number,
                 $photo,
@@ -254,6 +258,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <label>Hometown</label><br>
     <input type="text" name="hometown" value="<?= htmlspecialchars($player['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+
+
+    <label>Province/State</label><br>
+    <input type="text" name="province_state" value="<?= htmlspecialchars($player['province_state'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Club Team</label><br>

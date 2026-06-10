@@ -82,9 +82,11 @@ $currentPage = basename($_SERVER['PHP_SELF'] ?? ''); // Get current page filenam
             <div class="site-nav-links">
                 <a href="dashboard.php">Dashboard</a>
                 <span aria-hidden="true">|</span>
-                <a href="create-player.php">Add Player</a>
+                <a href="create-player.php">Add New Player</a>
                 <span aria-hidden="true">|</span>
                 <a href="create-report.php">Create Scouting Report</a>
+                <span aria-hidden="true">|</span>
+                <a href="view-players.php">View All Players</a>
                 <?php if (current_user_is_manager()) : ?> 
                     <span aria-hidden="true">|</span>
                     <a href="manage-users.php">Manage Users</a>

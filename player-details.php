@@ -136,6 +136,10 @@ $latestOverallRating = !empty($reports) ? $reports[0]['overall_rating'] : null; 
             <span class="info-value"><?= htmlspecialchars($player['hometown'] ?: 'Unknown', ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <div class="info-item">
+            <span class="info-label">Province/State</span>
+            <span class="info-value"><?= htmlspecialchars($player['province_state'] ?: 'Unknown', ENT_QUOTES, 'UTF-8'); ?></span>
+        </div>
+        <div class="info-item">
             <span class="info-label">Club Team</span>
             <span class="info-value"><?= htmlspecialchars($player['club_team'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
