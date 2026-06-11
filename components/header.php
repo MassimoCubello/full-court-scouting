@@ -78,7 +78,7 @@ $currentPage = basename($_SERVER['PHP_SELF'] ?? ''); // Get current page filenam
 <body>
     <?php if (isset($_SESSION['user_id'])) : ?> <!-- If user is logged in, show navigation menu -->
         <nav class="site-nav" aria-label="Primary">
-            <span class="site-brand">Full Court Scouting</span>
+            <a class="site-brand" href="dashboard.php">Full Court Scouting</a>
             <div class="site-nav-links">
                 <a href="dashboard.php">Dashboard</a>
                 <span aria-hidden="true">|</span>

@@ -158,6 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 
 <h1>Add New Player</h1>
 
+<p class="required-note">Fields marked with * are required.</p>
+
 <?php if (isset($error)) : ?> 
     <p><?= $error; ?></p>
 <?php endif; ?>

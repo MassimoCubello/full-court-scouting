@@ -94,6 +94,8 @@ $latestOverallRating = !empty($reports) ? $reports[0]['overall_rating'] : null; 
     </div>
 
     <div class="player-actions">
+        <a class="reports-cta" href="create-report.php?player_id=<?= $player['id']; ?>">Create New Report</a>
+        <span aria-hidden="true">|</span>
         <a href="edit-player.php?id=<?= $player['id']; ?>">Edit Player</a>
 
         <?php if (current_user_is_manager()) : ?>
@@ -157,7 +159,6 @@ $latestOverallRating = !empty($reports) ? $reports[0]['overall_rating'] : null; 
 <section class="reports-section">
     <div class="reports-header-row">
         <h2>Scouting Reports</h2>
-        <a class="reports-cta" href="create-report.php?player_id=<?= $player['id']; ?>">Create New Report</a>
     </div>
 
     <?php if (!empty($reports)) : ?>

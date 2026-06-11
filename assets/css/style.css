@@ -520,6 +520,90 @@ div[style*='border:1px solid black'] { /* Styles for divs with inline style cont
     max-width: none;
 }
 
+.report-details-layout {
+    display: grid;
+    gap: 1rem;
+}
+
+.report-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.report-header-actions .reports-cta {
+    margin: 0;
+}
+
+.danger-cta {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.danger-cta:hover {
+    background: #B91C1C;
+    color: #FFFFFF;
+}
+
+.report-overview-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    gap: 0.85rem;
+    align-items: start;
+}
+
+.report-overview-card {
+    border-left-width: 4px;
+    height: auto;
+}
+
+.report-section-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.22rem;
+}
+
+.report-traits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.report-notes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.report-note-card {
+    border-left-width: 4px;
+}
+
+.report-note-card-wide {
+    grid-column: 1 / -1;
+}
+
+.report-note-text {
+    margin: 0;
+    color: var(--color-primary-soft);
+    white-space: normal;
+}
+
+.report-overview-detail {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #E2E8F0;
+}
+
+.report-overview-detail .report-label {
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.report-detail-actions {
+    margin-top: 0.2rem;
+}
+
 @media (max-width: 768px) { /* Responsive styles for screens smaller than 768px */
     .site-nav {
         gap: 0.65rem;
@@ -564,6 +648,23 @@ div[style*='border:1px solid black'] { /* Styles for divs with inline style cont
     }
 
     .attribute-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .report-traits-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-notes-grid {
         grid-template-columns: 1fr;
     }
 }

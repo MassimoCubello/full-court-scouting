@@ -175,6 +175,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $player) { // Only process the form 
 
 <?php if (isset($error)) echo "<p>$error</p>"; ?>
 
+<p class="required-note">Fields marked with * are required.</p>
+
 <form method="POST">
 
     <h3>Player Selection</h3>
