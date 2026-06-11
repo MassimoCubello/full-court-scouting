@@ -7,6 +7,11 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+if (!current_user_can_write()) {
+    http_response_code(403);
+    die("Your account is inactive and cannot modify data.");
+}
+
 
 
 // PLAYER OPTIONS FOR DROPDOWN

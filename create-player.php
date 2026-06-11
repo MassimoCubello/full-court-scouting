@@ -9,6 +9,11 @@ if (!isset($_SESSION['user_id'])) { // If user is not logged in, redirect to log
     exit;
 }
 
+if (!current_user_can_write()) {
+    http_response_code(403);
+    die("Your account is inactive and cannot modify data.");
+}
+
 
 
 // HANDLE FORM SUBMISSION

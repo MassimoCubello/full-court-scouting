@@ -229,11 +229,13 @@ $result = $db->query($query); // Execute final query
             <?php endif; ?>
             <td>
                 <a href="player-details.php?id=<?= $player['id']; ?>">View</a>
-                |
-                <a href="create-report.php?player_id=<?= $player['id']; ?>">New Report</a>
+                <?php if (current_user_can_write()) : ?>
+                    |
+                    <a href="create-report.php?player_id=<?= $player['id']; ?>">New Report</a>
+                <?php endif; ?>
             </td>
         </tr>
-    <?php endwhile; ?> <!-- End loop -->
+    <?php endwhile; ?>
 </table>
 
 <?php include __DIR__ . "/components/footer.php"; ?> <!-- Footer and close database connection -->

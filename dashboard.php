@@ -83,11 +83,13 @@ $result = $db->query($query);
     </p>
 <?php endif; ?>
 
-<a href="create-player.php">Add New Player</a>
-|
-<a href="create-report.php">Create Scouting Report</a>
-|
 <a href="view-players.php">View All Players</a>
+<?php if (current_user_can_write()) : ?>
+    |
+    <a href="create-player.php">Add New Player</a>
+    |
+    <a href="create-report.php">Create Scouting Report</a>
+<?php endif; ?>
 |
 <a href="logout.php">Logout</a>
 
@@ -159,11 +161,13 @@ $result = $db->query($query);
                     View
                 </a>
 
-                |
+                <?php if (current_user_can_write()) : ?>
+                    |
 
-                <a href="create-report.php?player_id=<?= $player['id']; ?>">
-                    New Report
-                </a>
+                    <a href="create-report.php?player_id=<?= $player['id']; ?>">
+                        New Report
+                    </a>
+                <?php endif; ?>
 
             </td>
 

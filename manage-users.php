@@ -17,7 +17,6 @@ $manager_count = (int) $manager_count_result->fetch_assoc()['total']; // Prevent
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") { 
     $user_id = isset($_POST['user_id']) ? (int) $_POST['user_id'] : 0;
-    $action = $_POST['action'] ?? 'update_role';
     $role = $_POST['role'] ?? '';
 
     $stmt = $db->prepare("SELECT role FROM users WHERE id = ?");
@@ -25,33 +24,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $target_user = $stmt->get_result()->fetch_assoc();
 
-    if ($user_id <= 0 || !$target_user) {
+    if ($user_id <= 0 || !$target_user) { // Validate user ID
         $error = "Invalid user request.";
-    } elseif ($action === 'delete_user') { 
-        if ($target_user['role'] === 'manager' && $manager_count <= 1) { // Prevent deleting the last manager account
-            $error = "You cannot delete the last manager account.";
-        } else { // Proceed with user deletion
-            $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
-            $stmt->bind_param("i", $user_id);
-
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "User deleted successfully.";
-            header("Location: manage-users.php"); // Redirect to manage-users.php
-            exit;
-        }
-
-        $error = "Failed to delete user.";
-    }
-} elseif (!in_array($role, ['scout', 'manager'], true)) {
+    } elseif (!in_array($role, ['scout', 'manager', 'inactive'], true)) { // Validate role 
         $error = "Invalid user update request.";
-    } elseif ($target_user['role'] === 'manager' && $role !== 'manager' && $manager_count <= 1) {
-        $error = "You cannot remove the last manager account.";
-    } else {
+    } elseif ($target_user['role'] === 'manager' && $role !== 'manager' && $manager_count <= 1) { // Prevent demoting the last manager
+        $error = "You cannot change the last manager account to a non-manager role.";
+    } else { // Update the user's role in the database
         $stmt = $db->prepare("UPDATE users SET role = ? WHERE id = ?");
         $stmt->bind_param("si", $role, $user_id);
 
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "User role updated successfully.";
+        if ($stmt->execute()) { // Success message and redirect
+            $_SESSION['success'] = "User role/status updated successfully.";
             header("Location: manage-users.php");
             exit;
         }
@@ -72,7 +56,7 @@ $result = $db->query("
 
 <h1>Manage Users</h1>
 
-<p>Managers can promote scouts and keep full report access across the app.</p>
+<p>Managers can assign user roles. Inactive users remain in the system but lose edit/delete report permissions.</p>
 
 <?php if (!empty($success)) : ?>
     <p><?= htmlspecialchars($success) ?></p>
@@ -101,14 +85,12 @@ $result = $db->query("
                     <select name="role">
                         <option value="scout" <?= $user['role'] === 'scout' ? 'selected' : '' ?>>Scout</option>
                         <option value="manager" <?= $user['role'] === 'manager' ? 'selected' : '' ?>>Manager</option>
+                        <option value="inactive" <?= $user['role'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
                     </select>
             </td>
             <td><?= htmlspecialchars($user['created_at']) ?></td>
             <td>
-                    <button type="submit" name="action" value="update_role">Save Role</button>
-                    <button type="submit" name="action" value="delete_user" onclick="return confirm('Delete this user and all of their reports?');" style="color:red;">
-                        Delete User
-                    </button>
+                    <button type="submit">Save Role</button>
                 </form>
             </td>
         </tr>

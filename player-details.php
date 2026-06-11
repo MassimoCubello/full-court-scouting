@@ -35,6 +35,15 @@ if (!$player) {
     die("Player not found.");
 }
 
+$playerAge = null;
+if (!empty($player['date_of_birth'])) {
+    $dateOfBirth = date_create($player['date_of_birth']);
+
+    if ($dateOfBirth !== false) {
+        $playerAge = $dateOfBirth->diff(new DateTimeImmutable('today'))->y;
+    }
+}
+
 
 
 // GET REPORTS FOR PLAYER
@@ -93,16 +102,18 @@ $latestOverallRating = !empty($reports) ? $reports[0]['overall_rating'] : null; 
         </div>
     </div>
 
-    <div class="player-actions">
-        <a class="reports-cta" href="create-report.php?player_id=<?= $player['id']; ?>">Create New Report</a>
-        <span aria-hidden="true">|</span>
-        <a href="edit-player.php?id=<?= $player['id']; ?>">Edit Player</a>
-
-        <?php if (current_user_is_manager()) : ?>
+    <?php if (current_user_can_write()) : ?>
+        <div class="player-actions">
+            <a class="reports-cta" href="create-report.php?player_id=<?= $player['id']; ?>">Create New Report</a>
             <span aria-hidden="true">|</span>
-            <a class="danger-link" href="delete-player.php?id=<?= $player['id']; ?>">Delete Player</a>
-        <?php endif; ?>
-    </div>
+            <a href="edit-player.php?id=<?= $player['id']; ?>">Edit Player</a>
+
+            <?php if (current_user_is_manager()) : ?>
+                <span aria-hidden="true">|</span>
+                <a class="danger-link" href="delete-player.php?id=<?= $player['id']; ?>">Delete Player</a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
     <div class="player-info-grid">
         <div class="info-item">
@@ -119,7 +130,12 @@ $latestOverallRating = !empty($reports) ? $reports[0]['overall_rating'] : null; 
         </div>
         <div class="info-item">
             <span class="info-label">Date of Birth</span>
-            <span class="info-value"><?= htmlspecialchars($player['date_of_birth'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></span>
+            <span class="info-value">
+                <?= htmlspecialchars($player['date_of_birth'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?>
+                <?php if ($playerAge !== null) : ?>
+                    (<?= htmlspecialchars($playerAge, ENT_QUOTES, 'UTF-8'); ?> years old)
+                <?php endif; ?>
+            </span>
         </div>
         <div class="info-item">
             <span class="info-label">Height</span>

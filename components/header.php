@@ -43,6 +43,20 @@ if (!function_exists('current_user_is_manager')) { // Check if the current user 
     }
 }
 
+if (!function_exists('current_user_is_inactive')) {
+    function current_user_is_inactive(): bool
+    {
+        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'inactive';
+    }
+}
+
+if (!function_exists('current_user_can_write')) {
+    function current_user_can_write(): bool
+    {
+        return isset($_SESSION['user_id']) && !current_user_is_inactive();
+    }
+}
+
 if (!function_exists('current_user_can_manage_report')) { // Check if the current user can manage a specific report
     function current_user_can_manage_report(array $report): bool
     {
@@ -54,18 +68,10 @@ if (!function_exists('current_user_can_manage_report')) { // Check if the curren
     }
 }
 
-$pageTitle = $pageTitle ?? "Full Court Scouting"; // Set default page title if not already set
-$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? ''); // Get the current script name
-$basePath = rtrim(dirname($scriptName), '/'); // Calculate base path for stylesheet link
-
-if ($basePath === '/' || $basePath === '.') { // If base path is root, set it to empty string for correct stylesheet path
-    $basePath = '';
-}
-
-$cssFilePath = __DIR__ . '/../assets/css/style.css'; // Path to the CSS file for versioning
-$cssVersion = is_file($cssFilePath) ? (string) filemtime($cssFilePath) : '1'; // Use file modification time as version for cache busting, or '1' if file doesn't exist
-$stylesheetHref = ($basePath === '' ? '' : $basePath) . '/assets/css/style.css?v=' . $cssVersion; // Construct the stylesheet href with version query parameter for cache busting
-$currentPage = basename($_SERVER['PHP_SELF'] ?? ''); // Get current page filename for active link highlighting
+$pageTitle = $pageTitle ?? "Full Court Scouting";
+$basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+$stylesheetHref = ($basePath === '' ? '' : $basePath) . '/assets/css/style.css?v=20260527';
+$currentPage = basename($_SERVER['PHP_SELF'] ?? '');
 
 ?>
 <!DOCTYPE html>
@@ -85,9 +91,11 @@ $currentPage = basename($_SERVER['PHP_SELF'] ?? ''); // Get current page filenam
                 <a href="create-player.php">Add New Player</a>
                 <span aria-hidden="true">|</span>
                 <a href="create-report.php">Create Scouting Report</a>
+                <?php if (current_user_is_manager()) : ?>
                 <span aria-hidden="true">|</span>
                 <a href="view-players.php">View All Players</a>
-                <?php if (current_user_is_manager()) : ?> 
+                <?php endif; ?>
+                <?php if (current_user_is_manager()) : ?>
                     <span aria-hidden="true">|</span>
                     <a href="manage-users.php">Manage Users</a>
                 <?php endif; ?>
