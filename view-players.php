@@ -137,7 +137,6 @@ $result = $db->query($query); // Execute final query
 <p>Browse player profiles, latest ratings, and scouting actions.</p>
 
 <form method="GET">
-    <label for="search">Search</label><br>
     <input
         id="search"
         type="text"
@@ -145,8 +144,8 @@ $result = $db->query($query); // Execute final query
         placeholder="Search player name"
         value="<?= htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>"
     >
+    <label for="search">Search</label><br>
 
-    <label for="position">Position</label><br>
     <select id="position" name="position">
         <option value="">All Positions</option>
         <option value="PG" <?= $position == 'PG' ? 'selected' : '' ?>>PG</option>
@@ -155,8 +154,8 @@ $result = $db->query($query); // Execute final query
         <option value="PF" <?= $position == 'PF' ? 'selected' : '' ?>>PF</option>
         <option value="C" <?= $position == 'C' ? 'selected' : '' ?>>C</option>
     </select>
+    <label for="position">Position</label><br>
 
-    <label for="sort">Sort By</label><br>
     <select id="sort" name="sort">
         <option value="desc" <?= $sort == 'desc' ? 'selected' : '' ?>>
             Highest Rating
@@ -171,8 +170,8 @@ $result = $db->query($query); // Execute final query
             Name (Z-A)
         </option>
     </select>
+    <label for="sort">Sort By</label><br>
 
-    <label for="attribute">Attribute Filter</label><br>
     <select id="attribute" name="attribute">
         <option value="">Any Attribute</option>
         <?php foreach ($attributeMap as $attributeKey => $attributeConfig) : ?>
@@ -181,15 +180,15 @@ $result = $db->query($query); // Execute final query
             </option>
         <?php endforeach; ?>
     </select>
+    <label for="attribute">Attribute Filter</label><br>
 
-    <label for="attribute_comparison">Condition</label><br>
     <select id="attribute_comparison" name="attribute_comparison">
         <option value="gte" <?= $attributeComparison === 'gte' ? 'selected' : ''; ?>>At least</option>
         <option value="lte" <?= $attributeComparison === 'lte' ? 'selected' : ''; ?>>At most</option>
         <option value="eq" <?= $attributeComparison === 'eq' ? 'selected' : ''; ?>>Exactly</option>
     </select>
+    <label for="attribute_comparison">Condition</label><br>
 
-    <label for="attribute_value">Attribute Score</label><br>
     <input
         id="attribute_value"
         type="number"
@@ -200,6 +199,7 @@ $result = $db->query($query); // Execute final query
         placeholder="e.g. 80"
         value="<?= htmlspecialchars((string) $attributeValue, ENT_QUOTES, 'UTF-8'); ?>"
     >
+    <label for="attribute_value">Attribute Score</label><br>
 
     <p class="required-note">Attribute filters apply to each player's latest report.</p>
 
