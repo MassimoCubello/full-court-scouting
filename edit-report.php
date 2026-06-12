@@ -182,19 +182,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h3>Notes</h3>
 
     Strengths:<br>
-    <textarea name="strengths"><?= $report['strengths'] ?></textarea><br><br>
+    <textarea name="strengths" placeholder="e.g., Excellent ball handling, strong defensive skills"><?= htmlspecialchars($report['strengths'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     Areas for Improvement:<br>
-    <textarea name="areas_for_improvement"><?= $report['areas_for_improvement'] ?></textarea><br><br>
+    <textarea name="areas_for_improvement" placeholder="e.g., Needs to improve shooting accuracy"><?= htmlspecialchars($report['areas_for_improvement'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     Games Watched:<br>
-    <textarea name="games_watched"><?= $report['games_watched'] ?></textarea><br><br>
+    <textarea name="games_watched" placeholder="e.g., 24 PTS, 10 AST, 5 REB vs. Eastern High School (01/14/2026)"><?= htmlspecialchars($report['games_watched'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     Player Comparison:<br>
-    <input type="text" name="player_comparison" value="<?= $report['player_comparison'] ?>"><br><br>
+    <input type="text" name="player_comparison" placeholder="e.g., Comparable to LeBron James" value="<?= htmlspecialchars($report['player_comparison'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
     Notes:<br>
-    <textarea name="notes"><?= $report['notes'] ?></textarea><br><br>
+    <textarea name="notes" placeholder="Additional notes"><?= htmlspecialchars($report['notes'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     <button type="submit">
         Update Report

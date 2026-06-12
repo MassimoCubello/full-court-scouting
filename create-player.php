@@ -172,11 +172,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 <form method="POST" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
 
     <label>First Name *</label><br>
-    <input type="text" name="first_name" required value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="first_name" placeholder="e.g., Vince" required value="<?= htmlspecialchars($_POST['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Last Name *</label><br>
-    <input type="text" name="last_name" required value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="last_name" placeholder="e.g., Carter" required value="<?= htmlspecialchars($_POST['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Primary Position *</label><br>
@@ -223,39 +223,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 
 
     <label>Height</label><br>
-    <input type="text" name="height" placeholder="6'4&quot;" value="<?= htmlspecialchars($_POST['height'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="height" placeholder="e.g., 6'4&quot;" value="<?= htmlspecialchars($_POST['height'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Weight (lbs)</label><br>
-    <input type="number" name="weight" value="<?= htmlspecialchars($_POST['weight'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="number" name="weight" placeholder="e.g., 180" value="<?= htmlspecialchars($_POST['weight'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>School</label><br>
-    <input type="text" name="school" value="<?= htmlspecialchars($_POST['school'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="school" placeholder="e.g., Central High School" value="<?= htmlspecialchars($_POST['school'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Hometown</label><br>
-    <input type="text" name="hometown" value="<?= htmlspecialchars($_POST['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="hometown" placeholder="e.g., Toronto" value="<?= htmlspecialchars($_POST['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Province/State</label><br>
-    <input type="text" name="province_state" value="<?= htmlspecialchars($_POST['province_state'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="province_state" placeholder="e.g., Ontario" value="<?= htmlspecialchars($_POST['province_state'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Club Team</label><br>
-    <input type="text" name="club_team" value="<?= htmlspecialchars($_POST['club_team'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="club_team" placeholder="e.g., Humber Hawks" value="<?= htmlspecialchars($_POST['club_team'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Jersey Number</label><br>
-    <input type="number" name="jersey_number" value="<?= htmlspecialchars($_POST['jersey_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="number" name="jersey_number" placeholder="e.g., 23" value="<?= htmlspecialchars($_POST['jersey_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
-    <label>Photo</label><br>
-    <input type="file" name="photo" accept="image/*"><br><br>
+    <label>Photo (File must be a JPG, PNG, GIF, or WebP image.)</label><br>
+    <input type="file" name="photo" accept="image/jpeg, image/png, image/gif, image/webp"><br><br>
 
 
     <label>Nationality</label><br>
-    <input type="text" name="nationality" value="<?= htmlspecialchars($_POST['nationality'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="nationality" placeholder="e.g., Canadian" value="<?= htmlspecialchars($_POST['nationality'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <button type="submit">

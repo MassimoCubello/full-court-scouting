@@ -231,19 +231,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $player) { // Only process the form 
     <h3>Evaluation Notes</h3>
 
     Strengths:<br>
-    <textarea name="strengths"></textarea><br><br>
+    <textarea name="strengths" placeholder="e.g., Excellent ball handling, strong defensive skills"><?= htmlspecialchars($_POST['strengths'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     Areas for Improvement:<br>
-    <textarea name="areas_for_improvement"></textarea><br><br>
+    <textarea name="areas_for_improvement" placeholder="e.g., Needs to improve three-point shooting percentage"><?= htmlspecialchars($_POST['areas_for_improvement'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     Games Watched:<br>
-    <textarea name="games_watched"></textarea><br><br>
+    <textarea name="games_watched" placeholder="e.g., 24 PTS, 10 AST, 5 REB vs. Eastern High School (01/14/2026)"><?= htmlspecialchars($_POST['games_watched'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     Player Comparison:<br>
-    <input type="text" name="player_comparison"><br><br>
+    <input type="text" name="player_comparison" placeholder="e.g., Comparable to Derrick Rose" value="<?= htmlspecialchars($_POST['player_comparison'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
     Notes:<br>
-    <textarea name="notes"></textarea><br><br>
+    <textarea name="notes" placeholder="e.g., Team leader who motivates peers"><?= htmlspecialchars($_POST['notes'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea><br><br>
 
     <button type="submit">
         Submit Report

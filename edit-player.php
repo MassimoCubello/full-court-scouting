@@ -199,11 +199,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <form method="POST" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
 
     <label>First Name *</label><br>
-    <input type="text" name="first_name" required value="<?= htmlspecialchars($player['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="first_name" placeholder="e.g., Vince" required value="<?= htmlspecialchars($player['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Last Name *</label><br>
-    <input type="text" name="last_name" required value="<?= htmlspecialchars($player['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="last_name" placeholder="e.g., Carter" required value="<?= htmlspecialchars($player['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Primary Position *</label><br>
@@ -250,42 +250,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     <label>Height</label><br>
-    <input type="text" name="height" placeholder="6'4&quot;" value="<?= htmlspecialchars($player['height'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="height" placeholder="e.g., 6'4&quot;" value="<?= htmlspecialchars($player['height'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Weight (lbs)</label><br>
-    <input type="number" name="weight" value="<?= htmlspecialchars($player['weight'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="number" name="weight" placeholder="e.g., 180" value="<?= htmlspecialchars($player['weight'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>School</label><br>
-    <input type="text" name="school" value="<?= htmlspecialchars($player['school'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="school" placeholder="e.g., Central High School" value="<?= htmlspecialchars($player['school'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Hometown</label><br>
-    <input type="text" name="hometown" value="<?= htmlspecialchars($player['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="hometown" placeholder="e.g., Toronto" value="<?= htmlspecialchars($player['hometown'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Province/State</label><br>
-    <input type="text" name="province_state" value="<?= htmlspecialchars($player['province_state'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="province_state" placeholder="e.g., Ontario" value="<?= htmlspecialchars($player['province_state'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Club Team</label><br>
-    <input type="text" name="club_team" value="<?= htmlspecialchars($player['club_team'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="club_team" placeholder="e.g., Humber Hawks" value="<?= htmlspecialchars($player['club_team'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <label>Jersey Number</label><br>
-    <input type="number" name="jersey_number" min="0" value="<?= htmlspecialchars($player['jersey_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="number" name="jersey_number" min="0" placeholder="e.g., 23" value="<?= htmlspecialchars($player['jersey_number'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
-    <label>Photo</label><br>
+    <label>Photo (File must be a JPG, PNG, GIF, or WebP image.)</label><br>
     <?php if (!empty($player['photo'])) : ?>
         <img src="<?= htmlspecialchars($player['photo'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>" style="max-width:160px; display:block; margin-bottom:10px;">
     <?php endif; ?>
-    <input type="file" name="photo" accept="image/*"><br><br>
+    <input type="file" name="photo" accept="image/jpeg, image/png, image/gif, image/webp"><br><br>
 
 
     <label>Nationality</label><br>
-    <input type="text" name="nationality" value="<?= htmlspecialchars($player['nationality'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
+    <input type="text" name="nationality" placeholder="e.g., Canadian" value="<?= htmlspecialchars($player['nationality'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"><br><br>
 
 
     <button type="submit">

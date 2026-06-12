@@ -10,9 +10,11 @@ $dbUser = getenv('DB_USER') ?: 'root'; // Default to root if DB_USER is not set
 $dbPass = getenv('DB_PASS'); // Get DB password from environment variable
 $dbName = getenv('DB_NAME') ?: 'full_court_scouting'; // Default to 'full_court_scouting' if DB_NAME is not set
 
+
 if ($dbPass === false) { // If DB_PASS is not set, use MAMP default root password
-    $dbPass = 'root'; // MAMP default root password
+   $dbPass = 'root'; // MAMP default root password
 }
+
 
 $db = new mysqli($dbHost, $dbUser, $dbPass, $dbName, $dbPort); // Database connection with env variables
 
@@ -40,6 +42,13 @@ if (!function_exists('current_user_is_manager')) { // Check if the current user 
     function current_user_is_manager(): bool
     {
         return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'manager';
+    }
+}
+
+if (!function_exists('current_user_is_scout')) {
+    function current_user_is_scout(): bool
+    {
+        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'scout';
     }
 }
 
@@ -91,7 +100,7 @@ $currentPage = basename($_SERVER['PHP_SELF'] ?? '');
                 <a href="create-player.php">Add New Player</a>
                 <span aria-hidden="true">|</span>
                 <a href="create-report.php">Create Scouting Report</a>
-                <?php if (current_user_is_manager()) : ?>
+                <?php if (current_user_is_manager() || current_user_is_scout()) : ?>
                 <span aria-hidden="true">|</span>
                 <a href="view-players.php">View All Players</a>
                 <?php endif; ?>
