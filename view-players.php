@@ -13,6 +13,8 @@ $sort = $_GET['sort'] ?? 'desc';
 $attribute = $_GET['attribute'] ?? '';
 $attributeComparison = $_GET['attribute_comparison'] ?? 'gte';
 $attributeValue = $_GET['attribute_value'] ?? '';
+$page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+$playersPerPage = 20;
 
 $attributeMap = [ // Map of attribute keys to their corresponding trait IDs and labels
     'speed' => ['id' => 1, 'label' => 'Speed'],
@@ -37,6 +39,7 @@ $selectedTraitId = $selectedAttributeConfig['id'] ?? null; // Get the trait ID f
 $selectedAttributeLabel = $selectedAttributeConfig['label'] ?? null; // Get the label for the selected attribute
 
 $selectedAttributeSelect = ''; 
+$whereClause = "\nWHERE 1=1\n";
 
 if ($selectedTraitId !== null) { // Prepare the SQL query to select the attribute's value for each player
     $selectedAttributeSelect = ",
@@ -55,7 +58,7 @@ if ($selectedTraitId !== null) { // Prepare the SQL query to select the attribut
     ) AS selected_attribute_value";
 }
 
-$query = "
+$queryBase = "
 SELECT
     players.id,
     players.first_name,
@@ -74,13 +77,12 @@ SELECT
 
 FROM players
 
-WHERE 1=1
 ";
 
 if (!empty($search)) { // Add search condition if search term is inputted by user
     $safeSearch = $db->real_escape_string($search);
 
-    $query .= "
+    $whereClause .= "
         AND (
             players.first_name LIKE '%$safeSearch%'
             OR players.last_name LIKE '%$safeSearch%'
@@ -90,7 +92,7 @@ if (!empty($search)) { // Add search condition if search term is inputted by use
 
 if (!empty($position)) { // Add position filter if position is selected by user
     $safePosition = $db->real_escape_string($position);
-    $query .= " AND players.primary_position = '$safePosition' ";
+    $whereClause .= " AND players.primary_position = '$safePosition' ";
 }
 
 if ( // Add attribute filter condition
@@ -103,7 +105,7 @@ if ( // Add attribute filter condition
     $traitId = $attributeMap[$attribute]['id'];
     $comparisonOperator = $comparisonMap[$attributeComparison];
 
-    $query .= "
+    $whereClause .= "
         AND EXISTS (
             SELECT 1
             FROM ratings
@@ -120,6 +122,31 @@ if ( // Add attribute filter condition
     ";
 }
 
+$countQuery = "
+SELECT COUNT(*) AS total_players
+FROM players
+" . $whereClause; // Query to count total players matching the filters for pagination purposes
+
+$countResult = $db->query($countQuery);
+$totalPlayers = 0;
+
+if ($countResult) { // If count query executes successfully, fetch the total number of players from the result
+    $countRow = $countResult->fetch_assoc();
+    $totalPlayers = (int) ($countRow['total_players'] ?? 0);
+}
+
+$totalPages = $totalPlayers > 0 ? (int) ceil($totalPlayers / $playersPerPage) : 0; // Calculate total pages based on total players and players per page
+
+if ($totalPages > 0 && $page > $totalPages) { // If the requested page number exceeds the total pages, set it to the last page
+    $page = $totalPages;
+}
+
+$offset = ($page - 1) * $playersPerPage; // Calculate the offset for the SQL query based on the current page number and players per page
+$startItem = $totalPlayers > 0 ? $offset + 1 : 0; // Calculate the starting item number for the current page
+$endItem = $totalPlayers > 0 ? min($offset + $playersPerPage, $totalPlayers) : 0; // Calculate the ending item number for the current page 
+
+$query = $queryBase . $whereClause; // Combine the base query with the dynamically built WHERE clause based on user filters
+
 if ($sort === 'asc') {
     $query .= " ORDER BY latest_rating ASC";
 } elseif ($sort === 'name_asc') {
@@ -130,7 +157,23 @@ if ($sort === 'asc') {
     $query .= " ORDER BY latest_rating DESC";
 }
 
+$query .= " LIMIT $playersPerPage OFFSET $offset"; // Add pagination to the query by limiting the number of results and setting the offset based on the current page
+
 $result = $db->query($query); // Execute final query
+
+$queryParams = $_GET; // Store current GET parameters for pagination links
+unset($queryParams['page']); // Remove page parameter to avoid duplication in pagination links
+
+function buildQueryString(array $params): string // Helper function to build query string for pagination links while preserving existing filters and sorting options
+{
+    $filteredParams = array_filter($params, static function ($value) { // Filter out empty values to avoid including them in the query string
+        return $value !== '' && $value !== null;
+    });
+
+    return http_build_query($filteredParams); // Build and return the query string from the filtered parameters
+}
+
+$baseQueryString = buildQueryString($queryParams); // Build the base query string from current GET parameters to be used in pagination links, ensuring that all filters and sorting options are preserved when navigating between pages
 ?>
 
 <h1>View All Players</h1>
@@ -242,5 +285,29 @@ $result = $db->query($query); // Execute final query
         </tr>
     <?php endwhile; ?>
 </table>
+
+<?php if ($totalPages > 0) : ?> <!-- If there are results, show the summary and pagination links -->
+    <p class="pagination-summary">
+        Showing <?= $startItem; ?>–<?= $endItem; ?> of <?= $totalPlayers; ?> players
+    </p>
+
+    <div class="pagination"> 
+        <?php if ($page > 1) : ?> <!-- Show "Previous" link if not on the first page, preserving existing filters and sorting options in the query string -->
+            <a href="view-players.php?<?= htmlspecialchars($baseQueryString !== '' ? $baseQueryString . '&' : '', ENT_QUOTES, 'UTF-8'); ?>page=<?= $page - 1; ?>">Previous</a>
+        <?php endif; ?>
+
+        <?php for ($pageNumber = 1; $pageNumber <= $totalPages; $pageNumber++) : ?> <!-- Loop through page numbers and show links for each page, highlighting the current page number without a link -->
+            <?php if ($pageNumber === $page) : ?> 
+                <span aria-current="page"><?= $pageNumber; ?></span>
+            <?php else : ?> <!-- Show link for other page numbers, preserving existing filters and sorting options in the query string -->
+                <a href="view-players.php?<?= htmlspecialchars($baseQueryString !== '' ? $baseQueryString . '&' : '', ENT_QUOTES, 'UTF-8'); ?>page=<?= $pageNumber; ?>"><?= $pageNumber; ?></a>
+            <?php endif; ?>
+        <?php endfor; ?>
+
+        <?php if ($page < $totalPages) : ?> <!-- Show "Next" link if not on the last page, preserving existing filters and sorting options in the query string -->
+            <a href="view-players.php?<?= htmlspecialchars($baseQueryString !== '' ? $baseQueryString . '&' : '', ENT_QUOTES, 'UTF-8'); ?>page=<?= $page + 1; ?>">Next</a>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
 
 <?php include __DIR__ . "/components/footer.php"; ?> <!-- Footer and close database connection -->
