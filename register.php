@@ -9,19 +9,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get user 
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $plain_password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
-    $role = 'scout'; // Default role for new users
+    if ($plain_password !== $confirm_password) {
+        $error = "Passwords do not match.";
+    } else {
+        $password = password_hash($plain_password, PASSWORD_DEFAULT);
 
-    $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)"); // Prepare SQL statement to insert new user into database
-    $stmt->bind_param("sssss", $first_name, $last_name, $email, $password, $role);
+        $role = 'scout'; // Default role for new users
 
-    if ($stmt->execute()) { // Registration successful message and redirect to login
-        $_SESSION['success'] = "Account created successfully!";
-        header("Location: login.php");
-        exit;
-    } else { // Registration failed due to duplicate email
-        $error = "Registration failed (email may already exist).";
+        $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)"); // Prepare SQL statement to insert new user into database
+        $stmt->bind_param("sssss", $first_name, $last_name, $email, $password, $role);
+
+        if ($stmt->execute()) { // Registration successful message and redirect to login
+            $_SESSION['success'] = "Account created successfully!";
+            header("Location: login.php");
+            exit;
+        } else { // Registration failed due to duplicate email
+            $error = "Registration failed (email may already exist).";
+        }
     }
 }
 ?>
@@ -44,6 +51,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Handle form submission (get user 
 
     <label for="register-password">Password *</label><br>
     <input id="register-password" name="password" type="password" placeholder="Password" required><br>
+
+    <label for="register-confirm-password">Confirm Password *</label><br>
+    <input id="register-confirm-password" name="confirm_password" type="password" placeholder="Confirm Password" required><br>
 
     <button type="submit">Register</button>
 </form>

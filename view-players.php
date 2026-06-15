@@ -204,6 +204,7 @@ $result = $db->query($query); // Execute final query
     <p class="required-note">Attribute filters apply to each player's latest report.</p>
 
     <button type="submit">Apply</button>
+    <button type="button" onclick="window.location.href='view-players.php'">Clear Filters</button>
 </form>
 
 <table>
@@ -220,7 +221,11 @@ $result = $db->query($query); // Execute final query
 
     <?php while($player = $result->fetch_assoc()) : ?> <!-- Loop through players and display in table -->
         <tr>
-            <td><?= htmlspecialchars($player['last_name'] . ', ' . $player['first_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <td>
+                <a href="player-details.php?id=<?= $player['id']; ?>">
+                    <?= htmlspecialchars($player['last_name'] . ', ' . $player['first_name'], ENT_QUOTES, 'UTF-8'); ?>
+                </a>
+            </td>
             <td><?= htmlspecialchars($player['primary_position'], ENT_QUOTES, 'UTF-8'); ?></td>
             <td><?= htmlspecialchars($player['school'] ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
             <td><?= $player['latest_rating'] ? htmlspecialchars((string) $player['latest_rating'], ENT_QUOTES, 'UTF-8') : 'N/A'; ?></td>
