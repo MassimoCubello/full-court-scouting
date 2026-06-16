@@ -146,9 +146,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { // Check if the form was submitted v
 
             if ($stmt->execute()) {
 
+                $new_player_id = $db->insert_id;
+
                 $_SESSION['success'] = "Player created successfully.";
 
-                header("Location: dashboard.php"); // Redirect to dashboard after successful creation
+                header("Location: player-details.php?id=" . (int) $new_player_id); // Redirect to the new player's details page after successful creation
                 exit;
 
             } else {
