@@ -10,11 +10,30 @@ if (!isset($_SESSION['user_id'])) {
 $search = $_GET['search'] ?? '';
 $position = $_GET['position'] ?? '';
 $sort = $_GET['sort'] ?? 'desc';
+$ownership = $_GET['ownership'] ?? (current_user_is_scout() ? 'mine' : 'all');
 $attribute = $_GET['attribute'] ?? '';
 $attributeComparison = $_GET['attribute_comparison'] ?? 'gte';
 $attributeValue = $_GET['attribute_value'] ?? '';
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $playersPerPage = 20;
+
+if (!in_array($ownership, ['all', 'mine'], true)) { // Validate ownership filter value, default to 'all' if invalid
+    $ownership = 'all';
+}
+
+$currentUserId = (int) $_SESSION['user_id']; // Get the current user ID from the session for use in filtering players based on ownership and permissions
+$playerCreatorColumn = null; // Variable to determine player ownership for filtering purposes.
+$creatorColumnCandidates = ['created_by', 'created_by_user_id', 'user_id']; // List of possible column names that could indicate the creator of the player in the players table
+
+foreach ($creatorColumnCandidates as $candidateColumn) { // Loop through candidate column names to find which one exists in the players table for determining player ownership
+    $safeCandidate = $db->real_escape_string($candidateColumn);
+    $columnResult = $db->query("SHOW COLUMNS FROM players LIKE '$safeCandidate'");
+
+    if ($columnResult && $columnResult->num_rows > 0) { // If a candidate column exists in the players table, use it to determine player ownership for filtering "My Players"
+        $playerCreatorColumn = $candidateColumn;
+        break;
+    }
+}
 
 $attributeMap = [ // Map of attribute keys to their corresponding trait IDs and labels
     'speed' => ['id' => 1, 'label' => 'Speed'],
@@ -93,6 +112,25 @@ if (!empty($search)) { // Add search condition if search term is inputted by use
 if (!empty($position)) { // Add position filter if position is selected by user
     $safePosition = $db->real_escape_string($position);
     $whereClause .= " AND players.primary_position = '$safePosition' ";
+}
+
+if ($ownership === 'mine') { // Add ownership filter conditions to show only players that the current user has written reports for or created, depending on the available columns in the players table
+    $mineConditions = [ // Condition to include players that the current user has written reports for
+        "
+        EXISTS (
+            SELECT 1
+            FROM reports
+            WHERE reports.player_id = players.id
+              AND reports.user_id = $currentUserId
+        )
+        "
+    ];
+
+    if ($playerCreatorColumn !== null) { // If a creator column exists in the players table, add condition to include players created by the current user
+        $mineConditions[] = "players.$playerCreatorColumn = $currentUserId";
+    }
+
+    $whereClause .= "\n AND (" . implode(" OR ", $mineConditions) . ")\n"; // Combine ownership conditions with OR logic to include players that meet either condition
 }
 
 if ( // Add attribute filter condition
@@ -174,12 +212,23 @@ function buildQueryString(array $params): string // Helper function to build que
 }
 
 $baseQueryString = buildQueryString($queryParams); // Build the base query string from current GET parameters to be used in pagination links, ensuring that all filters and sorting options are preserved when navigating between pages
+
+$pageHeading = $ownership === 'mine' ? 'My Reports' : 'View All Players';
+$pageDescription = $ownership === 'mine'
+    ? 'Players you have written reports for' . ($playerCreatorColumn !== null ? ' or created.' : '.')
+    : 'Browse player profiles, latest ratings, and scouting actions.';
 ?>
 
-<h1>View All Players</h1>
-<p>Browse player profiles, latest ratings, and scouting actions.</p>
+<h1><?= htmlspecialchars($pageHeading, ENT_QUOTES, 'UTF-8'); ?></h1>
+<p><?= htmlspecialchars($pageDescription, ENT_QUOTES, 'UTF-8'); ?></p>
 
 <form method="GET">
+    <select id="ownership" name="ownership">
+        <option value="all" <?= $ownership === 'all' ? 'selected' : ''; ?>>All Players</option>
+        <option value="mine" <?= $ownership === 'mine' ? 'selected' : ''; ?>>My Reports</option>
+    </select>
+    <label for="ownership">Scope</label><br>
+
     <input
         id="search"
         type="text"
