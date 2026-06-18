@@ -279,6 +279,33 @@ th { /* Styles for table header cells */
     background: linear-gradient(120deg, var(--color-primary) 0%, var(--color-secondary) 100%);
 }
 
+th.sortable-header { /* Styles for sortable table header cells */
+    padding: 0;
+}
+
+th.sortable-header a,
+th.sortable-header a:any-link,
+th.sortable-header a:visited,
+th.sortable-header a:hover,
+th.sortable-header a:focus,
+th.sortable-header a:active { /* Styles for links inside sortable table header cells */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    width: 100%;
+    padding: 0.74rem;
+    color: #F8FAFC !important;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+th.sortable-header .sort-indicator { /* Styles for the sort indicator (arrow) in sortable table header cells */
+    font-size: 0.88rem;
+    line-height: 1;
+}
+
 tr:nth-child(even) td { /* Styles for even table rows */
     background: #F8FAFC;
 }

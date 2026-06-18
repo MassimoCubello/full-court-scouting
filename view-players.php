@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $search = $_GET['search'] ?? '';
 $position = $_GET['position'] ?? '';
+$nationality = trim($_GET['nationality'] ?? '');
 $sort = $_GET['sort'] ?? 'desc';
 $ownership = $_GET['ownership'] ?? (current_user_is_scout() ? 'mine' : 'all');
 $attribute = $_GET['attribute'] ?? '';
@@ -16,6 +17,10 @@ $attributeComparison = $_GET['attribute_comparison'] ?? 'gte';
 $attributeValue = $_GET['attribute_value'] ?? '';
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $playersPerPage = 20;
+
+if (!in_array($sort, ['desc', 'asc', 'name_asc', 'name_desc', 'school_asc', 'school_desc'], true)) { // Validate sort value, default to 'desc' if invalid
+    $sort = 'desc';
+}
 
 if (!in_array($ownership, ['all', 'mine'], true)) { // Validate ownership filter value, default to 'all' if invalid
     $ownership = 'all';
@@ -109,12 +114,17 @@ if (!empty($search)) { // Add search condition if search term is inputted by use
     ";
 }
 
-if (!empty($position)) { // Add position filter if position is selected by user
+if (!empty($position)) { // Position filter if position is selected by user
     $safePosition = $db->real_escape_string($position);
     $whereClause .= " AND players.primary_position = '$safePosition' ";
 }
 
-if ($ownership === 'mine') { // Add ownership filter conditions to show only players that the current user has written reports for or created, depending on the available columns in the players table
+if ($nationality !== '') { // Nationality filter if nationality is selected by user
+    $safeNationality = $db->real_escape_string($nationality);
+    $whereClause .= " AND players.nationality = '$safeNationality' ";
+}
+
+if ($ownership === 'mine') { // Ownership filter if ownership is set to 'mine'
     $mineConditions = [ // Condition to include players that the current user has written reports for
         "
         EXISTS (
@@ -191,6 +201,10 @@ if ($sort === 'asc') {
     $query .= " ORDER BY players.last_name ASC, players.first_name ASC";
 } elseif ($sort === 'name_desc') {
     $query .= " ORDER BY players.last_name DESC, players.first_name DESC";
+} elseif ($sort === 'school_asc') {
+    $query .= " ORDER BY players.school ASC, players.last_name ASC, players.first_name ASC";
+} elseif ($sort === 'school_desc') {
+    $query .= " ORDER BY players.school DESC, players.last_name ASC, players.first_name ASC";
 } else {
     $query .= " ORDER BY latest_rating DESC";
 }
@@ -212,6 +226,53 @@ function buildQueryString(array $params): string // Helper function to build que
 }
 
 $baseQueryString = buildQueryString($queryParams); // Build the base query string from current GET parameters to be used in pagination links, ensuring that all filters and sorting options are preserved when navigating between pages
+
+$nationalityOptions = []; // Fetch distinct nationalities from the players table to populate
+$nationalityResult = $db->query("\n    SELECT DISTINCT nationality\n    FROM players\n    WHERE nationality IS NOT NULL AND nationality <> ''\n    ORDER BY nationality ASC\n");
+
+if ($nationalityResult) { // If the query to fetch distinct nationalities executes successfully, loop through the results
+    while ($nationalityRow = $nationalityResult->fetch_assoc()) {
+        if (isset($nationalityRow['nationality'])) {
+            $nationalityOptions[] = (string) $nationalityRow['nationality'];
+        }
+    }
+}
+
+$playerSortParams = $queryParams; // Prepare query parameters for player name sorting link, toggling between ascending and descending sort order
+$playerSortParams['sort'] = $sort === 'name_asc' ? 'name_desc' : 'name_asc';
+$playerSortQueryString = buildQueryString($playerSortParams);
+$playerSortHref = 'view-players.php' . ($playerSortQueryString !== '' ? '?' . $playerSortQueryString : '');
+
+$ratingSortParams = $queryParams; // Prepare query parameters for latest overall rating sorting link, toggling between ascending and descending sort order
+$ratingSortParams['sort'] = $sort === 'desc' ? 'asc' : 'desc'; 
+$ratingSortQueryString = buildQueryString($ratingSortParams);
+$ratingSortHref = 'view-players.php' . ($ratingSortQueryString !== '' ? '?' . $ratingSortQueryString : '');
+
+$schoolSortParams = $queryParams; // Prepare query parameters for school sorting link, toggling between ascending and descending sort order
+$schoolSortParams['sort'] = $sort === 'school_asc' ? 'school_desc' : 'school_asc';
+$schoolSortQueryString = buildQueryString($schoolSortParams);
+$schoolSortHref = 'view-players.php' . ($schoolSortQueryString !== '' ? '?' . $schoolSortQueryString : '');
+
+$playerSortIndicator = ''; // Determine the sort indicator (arrow) to display in the player name column header based on the current sort order
+if ($sort === 'name_asc') { 
+    $playerSortIndicator = '&uarr;';
+} elseif ($sort === 'name_desc') {
+    $playerSortIndicator = '&darr;';
+}
+
+$ratingSortIndicator = ''; // Determine the sort indicator (arrow) to display in the latest overall rating column header based on the current sort order
+if ($sort === 'asc') {
+    $ratingSortIndicator = '&uarr;';
+} elseif ($sort === 'desc') {
+    $ratingSortIndicator = '&darr;';
+}
+
+$schoolSortIndicator = ''; // Determine the sort indicator (arrow) to display in the school column header based on the current sort order
+if ($sort === 'school_asc') {
+    $schoolSortIndicator = '&uarr;';
+} elseif ($sort === 'school_desc') {
+    $schoolSortIndicator = '&darr;';
+}
 
 $pageHeading = $ownership === 'mine' ? 'My Reports' : 'View All Players';
 $pageDescription = $ownership === 'mine'
@@ -248,21 +309,17 @@ $pageDescription = $ownership === 'mine'
     </select>
     <label for="position">Position</label><br>
 
-    <select id="sort" name="sort">
-        <option value="desc" <?= $sort == 'desc' ? 'selected' : '' ?>>
-            Highest Rating
-        </option>
-        <option value="asc" <?= $sort == 'asc' ? 'selected' : '' ?>>
-            Lowest Rating
-        </option>
-        <option value="name_asc" <?= $sort == 'name_asc' ? 'selected' : '' ?>>
-            Name (A-Z)
-        </option>
-        <option value="name_desc" <?= $sort == 'name_desc' ? 'selected' : '' ?>>
-            Name (Z-A)
-        </option>
+    <select id="nationality" name="nationality">
+        <option value="">All Nationalities</option>
+        <?php foreach ($nationalityOptions as $nationalityOption) : ?>
+            <option value="<?= htmlspecialchars($nationalityOption, ENT_QUOTES, 'UTF-8'); ?>" <?= $nationality === $nationalityOption ? 'selected' : ''; ?>>
+                <?= htmlspecialchars($nationalityOption, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+        <?php endforeach; ?>
     </select>
-    <label for="sort">Sort By</label><br>
+    <label for="nationality">Nationality</label><br>
+
+    <input type="hidden" name="sort" value="<?= htmlspecialchars($sort, ENT_QUOTES, 'UTF-8'); ?>">
 
     <select id="attribute" name="attribute">
         <option value="">Any Attribute</option>
@@ -301,10 +358,31 @@ $pageDescription = $ownership === 'mine'
 
 <table>
     <tr>
-        <th>Player</th>
+        <th class="sortable-header">
+            <a href="<?= htmlspecialchars($playerSortHref, ENT_QUOTES, 'UTF-8'); ?>" aria-label="Sort by player name">
+                Player
+                <?php if ($playerSortIndicator !== '') : ?>
+                    <span class="sort-indicator" aria-hidden="true"><?= $playerSortIndicator; ?></span>
+                <?php endif; ?>
+            </a>
+        </th>
         <th>Position</th>
-        <th>School</th>
-        <th>Latest Overall Rating</th>
+        <th class="sortable-header">
+            <a href="<?= htmlspecialchars($schoolSortHref, ENT_QUOTES, 'UTF-8'); ?>" aria-label="Sort by school">
+                School
+                <?php if ($schoolSortIndicator !== '') : ?>
+                    <span class="sort-indicator" aria-hidden="true"><?= $schoolSortIndicator; ?></span>
+                <?php endif; ?>
+            </a>
+        </th>
+        <th class="sortable-header">
+            <a href="<?= htmlspecialchars($ratingSortHref, ENT_QUOTES, 'UTF-8'); ?>" aria-label="Sort by latest overall rating">
+                Latest Overall Rating
+                <?php if ($ratingSortIndicator !== '') : ?>
+                    <span class="sort-indicator" aria-hidden="true"><?= $ratingSortIndicator; ?></span>
+                <?php endif; ?>
+            </a>
+        </th>
         <?php if ($selectedAttributeLabel !== null) : ?> <!-- If an attribute filter is selected, show the corresponding column header -->
             <th><?= htmlspecialchars($selectedAttributeLabel, ENT_QUOTES, 'UTF-8'); ?></th>
         <?php endif; ?>
